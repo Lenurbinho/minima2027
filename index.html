@@ -287,12 +287,12 @@ function athletesDe(champId, genre, epreuveId) {
 function puces(liste, type) {
   if (!liste.length) return '<span class="vide">Aucun athlète pour l\'instant</span>';
   return liste.map(a => {
-    const lieu = a.lieu ? ` — ${a.lieu}` : '';
     const tag = a.condition === 'plein_air' ? `<span class="tag">${esc(a.epreuve_realisee || 'plein air')}</span>` : '';
-    return `<span class="puce" title="${esc((a.source || '') + lieu)}">
+    const quand = [a.date ? dateFr(a.date) : '', a.lieu || ''].filter(Boolean).join(' · ');
+    return `<span class="puce" title="Source : ${esc(a.source || '')}">
       <span class="n">${esc(a.nom)}</span>
       <span class="p">${esc(perf(a.perf, type))}</span>${tag}
-      ${a.date ? `<span class="dt">${esc(dateFr(a.date))}</span>` : ''}
+      ${quand ? `<span class="dt">${esc(quand)}</span>` : ''}
     </span>`;
   }).join('');
 }
