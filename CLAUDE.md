@@ -17,14 +17,17 @@ Les championnats jeunes de l'été 2027 s'ajouteront comme onglets supplémentai
   `references/EA_EIC2027_Qualification_System_avril2026.pdf`).
 - ⏳ **Minima et modalités FFA : pas encore publiés** — l'utilisateur les fournira.
   Champ `ffa: null` partout et `minima_ffa_publies: false`.
-- ⏳ Scraper 2027 pas encore écrit (voir Feuille de route). Pas encore de workflow GitHub Actions.
+- ✅ `scraper.py` (03/11/2026) : WA + FFA, salle + plein air, testé en réel (~1 min,
+  162 requêtes, 32 qualifiés sur les standards EA, perfs de l'été 2026 et de fin d'hiver 2026).
+- ⏳ Pas encore de workflow GitHub Actions (lancement manuel : `python scraper.py`).
 
 ## Architecture
 
 ```
 data/championnats.json   ← SOURCE UNIQUE : championnats, épreuves, standards EA + FFA,
                             périodes, dates clés, règles, thème graphique
-data/achievements.json   ← généré par le scraper (ne pas éditer à la main)
+data/achievements.json   ← généré par scraper.py (ne pas éditer à la main)
+scraper.py               ← WA + FFA → achievements.json (sources par épreuve : dict SOURCES)
 index.html               ← site statique, lit les 2 JSON via fetch()
 assets/                  ← visuels des championnats (bannière Valencia)
 references/              ← règlements, dictionnaire des codes FFA, code 2026
@@ -86,10 +89,18 @@ Déjà saisi dans `championnats.json`. Points qui comptent pour le scraper :
     seule la date est hors période : une perf moins bonne plus bas peut être dans la période.
   - Ne lire que `page=1` fonctionnait en 2026 pour la France ; à vérifier si des épreuves
     très fournies (60 m) dépassent une page.
-- **À vérifier pour l'hiver** : segment `{environnement}` (`indoor` / `outdoor` / `all`),
-  slugs salle (`sprints/60-metres`, `hurdles/60-metres-hurdles`, `combined-events/heptathlon`,
-  `combined-events/pentathlon`), et ce que couvre l'année « 2027 » en salle
-  (les meetings de décembre 2026 sont-ils dans la liste 2027 ?).
+- Vérifié le 03/11/2026 : le segment `{environnement}` vaut `indoor` / `outdoor`, mais
+  **la liste `indoor` du 400 m et plus contient aussi les perfs plein air** (et inversement).
+  Seule la mention `(i)` à la fin du lieu est fiable pour savoir si une perf est en salle :
+  le scraper s'en sert (mode `auto`). Sans ça, des perfs plein air passaient avec le
+  standard salle, plus facile (faux qualifiés au 400 m, 800 m, 1500 m).
+- Noms WA déjà au format `Prénom NOM` (NOM en majuscules). Lieu : `Stade, Ville (PAYS) (i)`.
+- 100 lignes par page, page 1 seulement : suffisant pour des standards de ce niveau.
+- Combinées en salle (`combined-events/heptathlon` / `pentathlon` en `indoor`) : liste
+  vide, même sans filtre pays. Le plein air (`decathlon`, `heptathlon`) fonctionne.
+  En salle, on compte sur la FFA (codes 716 / 714).
+- **À vérifier en décembre** : la liste WA « 2027 » en salle reprend-elle les meetings de
+  décembre 2026 ? (vide au 03/11/2026, le scraper interroge 2026 et 2027).
 - WA peut renvoyer des tableaux vides tôt le matin (maintenance) : le run de 6h56 du
   26/06/2026 a raté une qualifiée que le run suivant a trouvée. → voir « Garde-fous ».
 
@@ -98,8 +109,16 @@ Déjà saisi dans `championnats.json`. Points qui comptent pour le scraper :
   - `frmsexe=M` pour les hommes (`H` ne renvoie rien), `F` pour les femmes.
   - `frmcategorie` : vide = toutes, `JU` = U20, `CA` = U18, `ES` = U23.
   - `frmnationalite=1` : Français uniquement (indispensable).
-  - **À vérifier pour l'hiver** : `frmespace` semble choisir salle/plein air ; et l'année
-    FFA d'une perf de décembre 2026.
+  - `frmespace` n'a **aucun effet**. Salle et plein air partagent le code pour les courses
+    du 400 m et plus ; les perfs en salle sont suffixées `(i)` (`6''54 (i) (RP)`). Codes
+    propres à la salle : 60 m 106, 60 m haies 354 (H) / 351 (F), 3000 m piste courte 231,
+    sauts 511–514, poids 657 (H) / 654 (F), heptathlon H 716, pentathlon F 714.
+  - L'année FFA n'est pas l'année civile : la liste « 2026 » contient des perfs de
+    septembre 2025. Le filtre de période fait le tri ; le scraper interroge 2026 et 2027.
+  - Les prénoms longs sont tronqués (`KOUNTA Muhammad Abdall`) : la clé de
+    dédoublonnage n'utilise que le NOM et le premier prénom.
+  - **À vérifier** : la FFA donne-t-elle une ou plusieurs perfs par athlète ? Si une seule,
+    seul WA (`bestResultsOnly=false`) rattrape une perf qualifiante qui n'est pas la meilleure.
 - Codes d'épreuve `frmepreuve` : `references/Dictionnaire_Epreuves_FFA.xlsx` (colonnes
   M-CA, M-JU, M-ES, F-CA… = catégories concernées). Les codes dépendent du **poids de
   l'engin / hauteur des haies** : un mauvais code ramène des seniors en U18 (bug 2026 :
@@ -125,10 +144,10 @@ Déjà saisi dans `championnats.json`. Points qui comptent pour le scraper :
   local n'était pas un dépôt git et on poussait via l'API GitHub fichier par fichier.
 
 ## Feuille de route (demandes de l'utilisateur, par ordre)
-1. **Scraper 2027** (`scraper/` ou `recherche_minima.py`) qui lit `championnats.json`,
-   interroge WA (salle + plein air équivalent) et la FFA, et écrit `achievements.json`.
-   Réutiliser les fonctions éprouvées de `references/legacy_2026/recherche_minima_v5.py`
-   (parsing des temps, dates, dédoublonnage) plutôt que de tout réécrire.
+1. ✅ **Scraper 2027** (`scraper.py`). Choix d'affichage : courses et combinées → la perf
+   en salle prime sur le plein air (c'est l'épreuve du championnat) ; concours (même
+   standard) → la meilleure perf. Restent à faire : courses mixtes (non détectables
+   aujourd'hui) et pistes surdimensionnées (pour l'instant traitées comme de la salle).
 2. **Minima FFA** : intégrer dès que l'utilisateur les fournit (nouveaux champs dans
    `championnats.json`, colonne « Minima FFA » déjà prévue sur le site).
 3. **Mise à jour quotidienne fiable** + workflow GitHub Actions.

@@ -1,6 +1,329 @@
 {
-  "maj": null,
-  "championnats": {
-    "eic2027": { "m": {}, "f": {} }
+ "maj": "2026-11-03T14:20+01:00",
+ "championnats": {
+  "eic2027": {
+   "m": {
+    "1500m": [
+     {
+      "nom": "Azeddine HABZ",
+      "perf": "3:32.56",
+      "date": "2026-02-22",
+      "lieu": "Toruń (POL)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Romain MORNET",
+      "perf": "3:35.24",
+      "date": "2026-02-22",
+      "lieu": "Toruń (POL)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Anas LAGTIY CHAOUDAR",
+      "perf": "3:30.31",
+      "date": "2026-06-28",
+      "lieu": "Paris (FRA)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": null
+     }
+    ],
+    "3000m": [
+     {
+      "nom": "Yann SCHRUB",
+      "perf": "7:35.71",
+      "date": "2026-03-21",
+      "lieu": "Toruń (POL)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Azeddine HABZ",
+      "perf": "7:39.87",
+      "date": "2026-03-21",
+      "lieu": "Toruń (POL)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Jimmy GRESSIER",
+      "perf": "7:28.67",
+      "date": "2026-06-17",
+      "lieu": "Montreuil (FRA)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": null
+     }
+    ],
+    "400m": [
+     {
+      "nom": "Samuel VESSAT",
+      "perf": "45.30",
+      "date": "2026-03-14",
+      "lieu": "Fayetteville, AR (USA)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Muhammad Abdallah KOUNTA",
+      "perf": "45.62",
+      "date": "2026-03-01",
+      "lieu": "Aubière (FRA)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     }
+    ],
+    "60m": [
+     {
+      "nom": "Pablo MATEO",
+      "perf": "6.54",
+      "date": "2026-02-28",
+      "lieu": "Aubière (FRA)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     }
+    ],
+    "60mH": [
+     {
+      "nom": "Wilhem BELOCIAN",
+      "perf": "7.42",
+      "date": "2026-03-21",
+      "lieu": "Toruń (POL)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Just KWAOU-MATHEY",
+      "perf": "7.49",
+      "date": "2026-03-01",
+      "lieu": "Aubière (FRA)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Romain LECOEUR",
+      "perf": "7.51",
+      "date": "2026-03-01",
+      "lieu": "Aubière (FRA)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Erwann CINNA",
+      "perf": "13.22",
+      "date": "2026-08-31",
+      "lieu": "Taranto (ITA)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": "110 m haies"
+     },
+     {
+      "nom": "Theo PEDRE",
+      "perf": "13.25",
+      "date": "2026-07-03",
+      "lieu": "Tomblaine (FRA)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": "110 m haies"
+     }
+    ],
+    "800m": [
+     {
+      "nom": "Yanis MEZIANE",
+      "perf": "1:42.78",
+      "date": "2026-09-13",
+      "lieu": "Budapest (HUN)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": null
+     }
+    ],
+    "perche": [
+     {
+      "nom": "Baptiste THIERY",
+      "perf": "5.93",
+      "date": "2026-06-28",
+      "lieu": "Paris (FRA)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Thibaut COLLET",
+      "perf": "5.91",
+      "date": "2026-07-05",
+      "lieu": "Athina (GRE)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": null
+     }
+    ],
+    "triple": [
+     {
+      "nom": "Melvin RAFFIN",
+      "perf": "17.29",
+      "date": "2026-05-31",
+      "lieu": "Forbach (FRA)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Jonathan SEREMES",
+      "perf": "17.25",
+      "date": "2026-03-14",
+      "lieu": "Fayetteville, AR (USA)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Thomas GOGOIS",
+      "perf": "17.02",
+      "date": "2026-07-26",
+      "lieu": "Albi (FRA)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": null
+     }
+    ]
+   },
+   "f": {
+    "1500m": [
+     {
+      "nom": "Agathe GUILLEMOT",
+      "perf": "3:59.71",
+      "date": "2026-03-22",
+      "lieu": "Toruń (POL)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     }
+    ],
+    "3000m": [
+     {
+      "nom": "Cassandre BEAUGRAND",
+      "perf": "8:32.86",
+      "date": "2026-07-10",
+      "lieu": "Monaco (MON)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": null
+     }
+    ],
+    "400m": [
+     {
+      "nom": "Isabelle BLACK",
+      "perf": "50.47",
+      "date": "2026-07-24",
+      "lieu": "Albi (FRA)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": null
+     }
+    ],
+    "60mH": [
+     {
+      "nom": "Laeticia BAPTÉ",
+      "perf": "7.83",
+      "date": "2026-02-28",
+      "lieu": "Aubière (FRA)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Sacha ALESSANDRINI",
+      "perf": "7.93",
+      "date": "2026-02-28",
+      "lieu": "Aubière (FRA)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Cyréna SAMBA-MAYELA",
+      "perf": "12.50",
+      "date": "2026-06-20",
+      "lieu": "Georgetown, TX (USA)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": "100 m haies"
+     }
+    ],
+    "800m": [
+     {
+      "nom": "Clara LIBERMAN",
+      "perf": "1:59.50",
+      "date": "2026-02-22",
+      "lieu": "Toruń (POL)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Anaïs BOURGOIN",
+      "perf": "1:55.65",
+      "date": "2026-06-28",
+      "lieu": "Paris (FRA)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Rénelle LAMOTE",
+      "perf": "1:56.93",
+      "date": "2026-06-28",
+      "lieu": "Paris (FRA)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": null
+     }
+    ],
+    "longueur": [
+     {
+      "nom": "Hilary KPATCHA",
+      "perf": "6.98",
+      "date": "2026-07-24",
+      "lieu": "Albi (FRA)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Yanis DAVID",
+      "perf": "6.86",
+      "date": "2026-07-24",
+      "lieu": "Albi (FRA)",
+      "source": "WA",
+      "condition": "plein_air",
+      "epreuve_realisee": null
+     }
+    ],
+    "perche": [
+     {
+      "nom": "Marie-Julie BONNIN",
+      "perf": "4.76",
+      "date": "2026-02-22",
+      "lieu": "Clermont-Ferrand (FRA)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     }
+    ]
+   }
   }
+ }
 }
