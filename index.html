@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minima Hiver 2027</title>
+<meta name="description" content="Athlètes français ayant réalisé les minima pour les championnats internationaux de l'hiver 2027.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Les variables ci-dessous sont les valeurs par défaut : le thème du championnat
+   actif (championnats.json → theme) les écrase au changement d'onglet. */
+:root {
+  --primaire: #1748d6;
+  --primaire-fonce: #0b2a8f;
+  --secondaire: #2b8cff;
+  --accent: #f6b400;
+  --accent-texte: #5c4100;
+  --fond: #eef3fc;
+  --surface: #ffffff;
+  --texte: #0c1a3d;
+  --texte-doux: #4e5d7e;
+  --bordure: #d5deef;
+  --police-titres: 'Outfit', system-ui, sans-serif;
+  --police-texte: 'Outfit', system-ui, sans-serif;
+  --police-chiffres: 'JetBrains Mono', ui-monospace, monospace;
+  --rayon: 14px;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--texte);
+  font-family: var(--police-texte);
+  font-size: 16px;
+  line-height: 1.45;
+}
+a { color: var(--primaire); }
+
+.bande {
+  height: 6px;
+  background: linear-gradient(90deg, var(--primaire-fonce), var(--primaire) 40%, var(--secondaire) 75%, var(--accent) 75%);
+}
+.wrapper { max-width: 1180px; margin: 0 auto; padding: 0 16px 48px; }
+
+/* ── En-tête ── */
+.entete {
+  display: flex; flex-wrap: wrap; gap: 16px 24px;
+  align-items: flex-end; justify-content: space-between;
+  padding: 28px 0 20px;
+}
+.surtitre {
+  font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--primaire);
+}
+h1 {
+  font-family: var(--police-titres);
+  font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 800; line-height: 1.1;
+  margin: 6px 0 0; letter-spacing: -.01em;
+}
+.maj {
+  background: var(--surface); border: 1px solid var(--bordure); border-radius: var(--rayon);
+  padding: 10px 14px; font-size: .85rem; color: var(--texte-doux); min-width: 220px;
+}
+.maj strong { display: block; color: var(--texte); font-size: 1rem; font-weight: 700; }
+.maj .point {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: #1fbf6a; margin-right: 6px; vertical-align: middle;
+}
+.maj.jamais .point { background: #b8c2d8; }
+
+/* ── Onglets (masqués tant qu'il n'y a qu'un championnat) ── */
+.onglets { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; }
+.onglet {
+  flex-shrink: 0; border: 1px solid var(--bordure); background: var(--surface); color: var(--texte-doux);
+  font: 600 .92rem var(--police-texte); padding: 9px 18px; border-radius: 999px; cursor: pointer;
+}
+.onglet[aria-selected="true"] { background: var(--primaire); border-color: var(--primaire); color: #fff; }
+
+/* ── Bandeau championnat ── */
+.hero {
+  display: grid; grid-template-columns: 1.15fr 1fr; gap: 0;
+  background: linear-gradient(135deg, var(--primaire-fonce), var(--primaire) 60%, var(--secondaire));
+  border-radius: calc(var(--rayon) + 4px); overflow: hidden; color: #fff;
+}
+.hero-texte { padding: 28px 28px 24px; display: flex; flex-direction: column; gap: 14px; }
+.hero-titre { font-family: var(--police-titres); font-size: clamp(1.35rem, 3vw, 1.9rem); font-weight: 800; line-height: 1.15; margin: 0; }
+.hero-meta { font-size: 1rem; opacity: .92; margin: 0; }
+.hero-meta b { color: var(--accent); font-weight: 700; }
+.chiffres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: auto; }
+.chiffre {
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22);
+  border-radius: 12px; padding: 10px 12px;
+}
+.chiffre .val { font-family: var(--police-chiffres); font-size: 1.45rem; font-weight: 700; line-height: 1.1; }
+.chiffre .lib { font-size: .78rem; opacity: .85; }
+.hero-visuel { background: var(--primaire); min-height: 220px; }
+.hero-visuel img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+
+/* ── Alerte minima FFA ── */
+.alerte {
+  margin: 16px 0 0; padding: 12px 16px; border-radius: var(--rayon);
+  background: #fff6db; border: 1px solid #f3d785; color: #5c4100; font-size: .93rem;
+}
+.alerte b { color: #3d2b00; }
+
+/* ── Infos : dates clés + règles ── */
+.infos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.carte {
+  background: var(--surface); border: 1px solid var(--bordure); border-radius: var(--rayon); padding: 18px 20px;
+}
+.carte h2 { font-family: var(--police-titres); font-size: 1.05rem; font-weight: 700; margin: 0 0 12px; }
+.frise { list-style: none; margin: 0; padding: 0; }
+.frise li { display: grid; grid-template-columns: 112px 1fr; gap: 10px; padding: 6px 0; font-size: .9rem; border-top: 1px dashed var(--bordure); }
+.frise li:first-child { border-top: 0; }
+.frise .d { font-family: var(--police-chiffres); font-size: .8rem; font-weight: 500; color: var(--texte-doux); padding-top: 2px; }
+.frise li.passe { color: var(--texte-doux); }
+.frise li.passe .lib::before { content: "✓ "; color: #1a9b58; font-weight: 700; }
+.frise li.encours { font-weight: 700; }
+.frise li.encours .d { color: var(--primaire); }
+.frise li.encours .lib::after {
+  content: "en cours"; margin-left: 8px; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+  background: var(--accent); color: var(--accent-texte); padding: 2px 7px; border-radius: 999px; vertical-align: 1px;
+}
+.regles { margin: 0; padding-left: 18px; font-size: .9rem; color: var(--texte-doux); }
+.regles li { margin: 0 0 7px; }
+.liens { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: .88rem; }
+
+/* ── Barre de filtre ── */
+.outils { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin: 28px 0 12px; }
+.outils h2 { font-family: var(--police-titres); font-size: 1.3rem; font-weight: 800; margin: 0; }
+.segment { display: inline-flex; background: var(--surface); border: 1px solid var(--bordure); border-radius: 999px; padding: 3px; }
+.segment button {
+  border: 0; background: none; font: 600 .88rem var(--police-texte); color: var(--texte-doux);
+  padding: 7px 14px; border-radius: 999px; cursor: pointer;
+}
+.segment button[aria-pressed="true"] { background: var(--primaire); color: #fff; }
+
+/* ── Tableau des épreuves ── */
+.tableau { background: var(--surface); border: 1px solid var(--bordure); border-radius: var(--rayon); overflow: hidden; }
+.ligne { display: grid; grid-template-columns: 170px 1fr 1fr; border-top: 1px solid var(--bordure); }
+.ligne:first-child { border-top: 0; }
+.tableau.un-genre .ligne { grid-template-columns: 170px 1fr; }
+.ligne.titres {
+  background: var(--primaire-fonce); color: #fff; font-size: .78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+}
+.ligne.titres > div { padding: 10px 16px; }
+.epreuve { padding: 14px 16px; border-right: 1px solid var(--bordure); }
+.epreuve .nom { font-family: var(--police-titres); font-weight: 700; font-size: 1.05rem; }
+.epreuve .quota { display: block; font-size: .78rem; color: var(--texte-doux); margin-top: 2px; }
+.genre { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.genre + .genre { border-left: 1px solid var(--bordure); }
+.std { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.std .g { display: none; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--texte-doux); width: 100%; }
+.std .sous-epreuve { font-weight: 600; font-size: .85rem; }
+.std .val {
+  font-family: var(--police-chiffres); font-weight: 700; font-size: 1rem; color: var(--primaire);
+  background: color-mix(in srgb, var(--primaire) 9%, transparent); padding: 1px 8px; border-radius: 6px;
+}
+.std .alt { font-size: .82rem; color: var(--texte-doux); }
+.std .alt span { font-family: var(--police-chiffres); font-weight: 500; }
+.std .ffa { font-size: .78rem; color: var(--texte-doux); font-style: italic; }
+.std .ffa.ok { font-style: normal; color: var(--texte); }
+.athletes { display: flex; flex-wrap: wrap; gap: 6px; }
+.vide { font-size: .85rem; color: #98a3bd; }
+.puce {
+  display: inline-flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; max-width: 100%;
+  background: color-mix(in srgb, var(--secondaire) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--secondaire) 25%, var(--surface));
+  border-left: 4px solid var(--accent); border-radius: 8px; padding: 5px 9px; font-size: .88rem;
+}
+.puce .n { font-weight: 600; }
+.puce .p { font-family: var(--police-chiffres); font-weight: 700; color: var(--primaire-fonce); white-space: nowrap; }
+.puce .dt { font-size: .76rem; color: var(--texte-doux); white-space: nowrap; }
+.puce .tag {
+  font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  background: var(--accent); color: var(--accent-texte); padding: 1px 6px; border-radius: 999px; white-space: nowrap;
+}
+
+.relais { margin-top: 12px; font-size: .9rem; color: var(--texte-doux); }
+
+.pied { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--bordure); font-size: .85rem; color: var(--texte-doux); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+.erreur { margin-top: 24px; padding: 16px; border-radius: var(--rayon); background: #fdecec; border: 1px solid #f2b8b8; color: #7a1414; }
+
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-visuel { order: -1; min-height: 0; aspect-ratio: 1280 / 560; }
+  .infos { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .hero-texte { padding: 20px 18px; }
+  .chiffre .val { font-size: 1.2rem; }
+  .ligne, .tableau.un-genre .ligne { grid-template-columns: 1fr; }
+  .ligne.titres { display: none; }
+  .epreuve { border-right: 0; border-bottom: 1px solid var(--bordure); background: color-mix(in srgb, var(--primaire) 5%, var(--surface)); padding: 10px 16px; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .epreuve .quota { display: inline; margin: 0; }
+  .genre + .genre { border-left: 0; border-top: 1px dashed var(--bordure); }
+  .std .g { display: block; }
+  .frise li { grid-template-columns: 96px 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="bande"></div>
+<div class="wrapper">
+
+  <header class="entete">
+    <div>
+      <div class="surtitre">FFA · Équipe de France</div>
+      <h1 id="titre-saison">Minima réalisés — Hiver 2027</h1>
+    </div>
+    <div class="maj jamais" id="maj">
+      <span class="point"></span>Dernière mise à jour
+      <strong id="maj-date">—</strong>
+      Sources : <a href="https://worldathletics.org" target="_blank" rel="noopener">World Athletics</a> &amp; <a href="https://www.athle.fr/" target="_blank" rel="noopener">FFA</a>
+    </div>
+  </header>
+
+  <nav class="onglets" id="onglets" role="tablist" hidden></nav>
+  <main id="contenu"></main>
+
+  <footer class="pied">
+    <span>Alexandre BRUNEL – Groupe d'animation FFA</span>
+    <span>Données issues des bilans World Athletics et FFA, filtrées automatiquement.</span>
+  </footer>
+</div>
+
+<script>
+const ETAT = { config: null, resultats: null, champ: null, genre: 'tous' };
+const MOIS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// "2027-03-04" → objet Date à minuit local (évite les décalages de fuseau)
+function jour(iso) { const [a, m, j] = iso.split('-').map(Number); return new Date(a, m - 1, j); }
+function dateFr(iso, court) {
+  const d = jour(iso);
+  return court ? `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`
+               : `${d.getDate()} ${MOIS[d.getMonth()]} ${d.getFullYear()}`;
+}
+function aujourdhui() { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+
+// Format WA → format d'affichage du site.
+// Courses : 6.58 → 6"58 · 1:45.60 → 1'45"60 · 1:02:30 → 1h02'30"
+// Concours : 8.17 inchangé · Combinées : 6250 pts
+function perf(valeur, type) {
+  if (valeur == null || valeur === '') return '–';
+  const v = String(valeur).trim();
+  if (type === 'combines') return `${v} pts`;
+  if (type === 'concours') return v;
+  const parties = v.split(':');
+  const [s, cs] = parties.pop().split('.');
+  const secondes = cs !== undefined ? `${s}"${cs}` : `${s}"`;
+  if (parties.length === 2) return `${Number(parties[0])}h${parties[1].padStart(2, '0')}'${secondes.padStart(3, '0')}`;
+  if (parties.length === 1) return `${Number(parties[0])}'${secondes.padStart(3, '0')}`;
+  return secondes;
+}
+
+function appliquerTheme(theme) {
+  const racine = document.documentElement.style;
+  const c = theme.couleurs || {};
+  const correspondance = {
+    primaire: '--primaire', primaire_fonce: '--primaire-fonce', secondaire: '--secondaire', accent: '--accent',
+    accent_texte: '--accent-texte', fond: '--fond', surface: '--surface', texte: '--texte', texte_doux: '--texte-doux', bordure: '--bordure'
+  };
+  for (const [cle, variable] of Object.entries(correspondance)) if (c[cle]) racine.setProperty(variable, c[cle]);
+  if (theme.police_titres) racine.setProperty('--police-titres', `'${theme.police_titres}', system-ui, sans-serif`);
+  if (theme.police_texte) racine.setProperty('--police-texte', `'${theme.police_texte}', system-ui, sans-serif`);
+  if (theme.police_chiffres) racine.setProperty('--police-chiffres', `'${theme.police_chiffres}', ui-monospace, monospace`);
+  if (theme.google_fonts && !document.querySelector(`link[data-polices="${theme.google_fonts}"]`)) {
+    const lien = document.createElement('link');
+    lien.rel = 'stylesheet';
+    lien.dataset.polices = theme.google_fonts;
+    lien.href = `https://fonts.googleapis.com/css2?${theme.google_fonts}&display=swap`;
+    document.head.appendChild(lien);
+  }
+}
+
+function athletesDe(champId, genre, epreuveId) {
+  return ETAT.resultats?.championnats?.[champId]?.[genre]?.[epreuveId] || [];
+}
+
+function puces(liste, type) {
+  if (!liste.length) return '<span class="vide">Aucun athlète pour l\'instant</span>';
+  return liste.map(a => {
+    const lieu = a.lieu ? ` — ${a.lieu}` : '';
+    const tag = a.condition === 'plein_air' ? `<span class="tag">${esc(a.epreuve_realisee || 'plein air')}</span>` : '';
+    return `<span class="puce" title="${esc((a.source || '') + lieu)}">
+      <span class="n">${esc(a.nom)}</span>
+      <span class="p">${esc(perf(a.perf, type))}</span>${tag}
+      ${a.date ? `<span class="dt">${esc(dateFr(a.date))}</span>` : ''}
+    </span>`;
+  }).join('');
+}
+
+function blocGenre(ch, ep, g) {
+  const s = ep[g];
+  if (!s) return '<div class="genre"></div>';
+  const plein = s.ea_plein_air ? `<span class="alt">ou plein air ${esc(s.ea_plein_air.epreuve)} : <span>${esc(perf(s.ea_plein_air.valeur, ep.type))}</span></span>` : '';
+  const ffa = s.ffa ? `<span class="ffa ok">Minima FFA : <b>${esc(perf(s.ffa, ep.type))}</b></span>` : '<span class="ffa">Minima FFA à venir</span>';
+  return `<div class="genre">
+    <div class="std">
+      <span class="g">${g === 'm' ? 'Hommes' : 'Femmes'}</span>
+      ${s.label ? `<span class="sous-epreuve">${esc(s.label)}</span>` : ''}
+      <span class="val" title="Standard European Athletics">${esc(perf(s.ea, ep.type))}</span>
+      ${plein}
+      ${ffa}
+    </div>
+    <div class="athletes">${puces(athletesDe(ch.id, g, ep.id), ep.type)}</div>
+  </div>`;
+}
+
+function statutDate(dc, auj) {
+  const debut = jour(dc.date), fin = dc.fin ? jour(dc.fin) : debut;
+  if (fin < auj) return 'passe';
+  if (debut <= auj && auj <= fin) return 'encours';
+  return '';
+}
+
+function rendreChampionnat(ch) {
+  const auj = aujourdhui();
+  const jours = Math.round((jour(ch.debut) - auj) / 86400000);
+  const compte = jours > 0 ? `J-${jours}` : (auj <= jour(ch.fin) ? 'En cours' : 'Terminé');
+  const uniques = g => new Set(ch.epreuves.flatMap(ep => athletesDe(ch.id, g, ep.id).map(a => a.nom))).size;
+  const fin = jour(ch.periodes.standards.fin);
+  // La période des Top Lists est en cours si elle a commencé et pas fini
+  const topEnCours = jour(ch.periodes.top_lists.debut) <= auj && auj <= fin;
+
+  // Une période "en cours" se lit mieux qu'un simple début passé : on marque en cours
+  // le dernier jalon de début déjà franchi tant que la fin n'est pas atteinte.
+  const jalons = ch.dates_cles.map(dc => ({ ...dc, statut: statutDate(dc, auj) }));
+  if (auj <= fin) {
+    const dernierDebut = jalons.filter(j => j.statut === 'passe' && jour(j.date) < fin).pop();
+    if (dernierDebut) dernierDebut.statut = 'encours';
+  }
+
+  const genres = ETAT.genre === 'tous' ? ['m', 'f'] : [ETAT.genre];
+  const titres = `<div class="ligne titres"><div>Épreuve</div>${genres.map(g => `<div>${g === 'm' ? 'Hommes' : 'Femmes'}</div>`).join('')}</div>`;
+  const lignes = ch.epreuves.map(ep => `<div class="ligne">
+      <div class="epreuve"><span class="nom">${esc(ep.label)}</span><span class="quota">${ep.quota} places</span></div>
+      ${genres.map(g => blocGenre(ch, ep, g)).join('')}
+    </div>`).join('');
+
+  const t = ch.theme || {};
+  document.getElementById('contenu').innerHTML = `
+    <section class="hero" aria-label="${esc(ch.nom)}">
+      <div class="hero-texte">
+        <h2 class="hero-titre">${esc(ch.nom)} — ${esc(ch.ville)} (${esc(ch.pays)})</h2>
+        <p class="hero-meta"><b>${jour(ch.debut).getDate()}–${dateFr(ch.fin)}</b> · ${esc(ch.lieu)}<br>${esc(ch.categorie)}</p>
+        <p class="hero-meta">Standards : ${dateFr(ch.periodes.standards.debut, true)} → ${dateFr(ch.periodes.standards.fin, true)}
+          ${topEnCours ? '· <b>Top Lists ouvertes</b>' : ''}</p>
+        <div class="chiffres">
+          <div class="chiffre"><div class="val">${compte}</div><div class="lib">avant les championnats</div></div>
+          <div class="chiffre"><div class="val">${uniques('m')}</div><div class="lib">qualifiés hommes</div></div>
+          <div class="chiffre"><div class="val">${uniques('f')}</div><div class="lib">qualifiées femmes</div></div>
+        </div>
+      </div>
+      <div class="hero-visuel">${t.banniere ? `<img src="${esc(t.banniere)}" alt="Logo des ${esc(ch.nom)} ${esc(ch.ville)}">` : ''}</div>
+    </section>
+
+    ${ch.minima_ffa_publies ? '' : `<div class="alerte"><b>Minima FFA pas encore publiés.</b> En attendant, le site affiche les standards European Athletics ; les minima FFA apparaîtront ici dès leur publication.</div>`}
+
+    <div class="infos">
+      <section class="carte">
+        <h2>Dates clés</h2>
+        <ol class="frise">${jalons.map(j => `<li class="${j.statut}"><span class="d">${dateFr(j.date, true)}</span><span class="lib">${esc(j.label)}</span></li>`).join('')}</ol>
+      </section>
+      <section class="carte">
+        <h2>À savoir</h2>
+        <ul class="regles">${ch.regles.map(r => `<li>${esc(r)}</li>`).join('')}</ul>
+        <div class="liens">${ch.liens.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join('')}</div>
+      </section>
+    </div>
+
+    <div class="outils">
+      <h2>Épreuves et athlètes</h2>
+      <div class="segment" role="group" aria-label="Filtrer par genre">
+        ${[['tous', 'Tous'], ['m', 'Hommes'], ['f', 'Femmes']].map(([v, l]) => `<button type="button" data-genre="${v}" aria-pressed="${ETAT.genre === v}">${l}</button>`).join('')}
+      </div>
+    </div>
+    <div class="tableau ${genres.length === 1 ? 'un-genre' : ''}">${titres}${lignes}</div>
+    ${(ch.relais || []).map(r => `<p class="relais"><b>${esc(r.label)}</b> — ${esc(r.note)}</p>`).join('')}
+  `;
+
+  document.querySelectorAll('.segment button').forEach(b => b.addEventListener('click', () => {
+    ETAT.genre = b.dataset.genre;
+    rendreChampionnat(ch);
+  }));
+}
+
+function choisirChampionnat(id) {
+  const ch = ETAT.config.championnats.find(c => c.id === id) || ETAT.config.championnats[0];
+  ETAT.champ = ch.id;
+  appliquerTheme(ch.theme || {});
+  document.querySelectorAll('.onglet').forEach(o => o.setAttribute('aria-selected', o.dataset.id === ch.id));
+  rendreChampionnat(ch);
+}
+
+async function demarrer() {
+  try {
+    const charger = url => fetch(url, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(url); return r.json(); });
+    const [config, resultats] = await Promise.all([charger('data/championnats.json'), charger('data/achievements.json')]);
+    ETAT.config = config;
+    ETAT.resultats = resultats;
+
+    document.getElementById('titre-saison').textContent = `Minima réalisés — ${config.saison}`;
+    if (resultats.maj) {
+      const d = new Date(resultats.maj);
+      document.getElementById('maj-date').textContent = d.toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' });
+      document.getElementById('maj').classList.remove('jamais');
+    } else {
+      document.getElementById('maj-date').textContent = 'Pas encore lancée';
+    }
+
+    const nav = document.getElementById('onglets');
+    if (config.championnats.length > 1) {
+      nav.hidden = false;
+      nav.innerHTML = config.championnats.map(c => `<button class="onglet" role="tab" data-id="${c.id}">${esc(c.onglet)}</button>`).join('');
+      nav.querySelectorAll('.onglet').forEach(o => o.addEventListener('click', () => choisirChampionnat(o.dataset.id)));
+    }
+    choisirChampionnat(config.championnats[0].id);
+  } catch (e) {
+    document.getElementById('contenu').innerHTML = `<div class="erreur"><b>Impossible de charger les données.</b>
+      En local, ouvrez le site via un petit serveur (<code>python -m http.server</code>) plutôt qu'en double-cliquant sur le fichier.</div>`;
+    console.error(e);
+  }
+}
+demarrer();
+</script>
+</body>
+</html>

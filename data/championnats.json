@@ -1,0 +1,100 @@
+{
+  "_doc": "Source unique de vérité : lue par index.html ET par le script de scraping. Valeurs de perf au format WA (6.58, 1:45.60, 8.17, 6250). 'ffa': null = minima FFA pas encore publiés.",
+  "saison": "Hiver 2027",
+  "championnats": [
+    {
+      "id": "eic2027",
+      "nom": "Championnats d'Europe en salle",
+      "onglet": "Europe en salle · Valencia",
+      "ville": "Valencia",
+      "pays": "ESP",
+      "lieu": "Velódromo Luis Puig",
+      "debut": "2027-03-04",
+      "fin": "2027-03-07",
+      "categorie": "Seniors (nés en 2011 ou avant)",
+      "minima_ffa_publies": false,
+      "liens": [
+        { "label": "Règlement European Athletics (avril 2026)", "url": "references/EA_EIC2027_Qualification_System_avril2026.pdf" },
+        { "label": "Page officielle European Athletics", "url": "https://www.european-athletics.com/competitions/european-athletics-indoor-championships-2027/overview" }
+      ],
+      "periodes": {
+        "standards":          { "debut": "2026-02-22", "fin": "2027-02-21", "label": "Standards (toutes épreuves sauf combinées)" },
+        "standards_combines": { "debut": "2025-08-22", "fin": "2027-02-21", "label": "Standards épreuves combinées" },
+        "top_lists":          { "debut": "2026-11-01", "fin": "2027-02-21", "label": "Top Lists (qualification au classement)" }
+      },
+      "dates_cles": [
+        { "date": "2025-08-22", "label": "Début de la période des standards — épreuves combinées" },
+        { "date": "2026-02-22", "label": "Début de la période des standards — autres épreuves" },
+        { "date": "2026-11-01", "label": "Début de la période des Top Lists" },
+        { "date": "2027-02-21", "label": "Fin des périodes de qualification (minuit)" },
+        { "date": "2027-02-22", "label": "Pré-inscriptions des fédérations (14h00)" },
+        { "date": "2027-02-23", "label": "Publication du « Road to Valencia » (12h00)" },
+        { "date": "2027-02-24", "label": "Inscriptions définitives (14h00)" },
+        { "date": "2027-03-04", "fin": "2027-03-07", "label": "Championnats à Valencia" }
+      ],
+      "regles": [
+        "Jusqu'à 4 athlètes qualifiés inscrits par pays et par épreuve, dont 3 au départ.",
+        "Qualification par le standard, ou par la position au Top List pour compléter le quota de l'épreuve.",
+        "Courses de 400 m et plus : les perfs sur piste couverte surdimensionnée comptent pour le standard plein air.",
+        "Refusés : chronos manuels (60 m, 100 m, 400 m, 800 m, haies), vent favorable non réglementaire ou non mesuré, courses mixtes.",
+        "Âge : nés en 2011 ou avant ; poids hommes réservé aux nés en 2009 ou avant.",
+        "4 × 400 m : 6 équipes (pays hôte, 3 via le bilan plein air 2026, 2 via le cumul des 400 m en salle 2027 au 21/02)."
+      ],
+      "theme": {
+        "google_fonts": "family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700",
+        "police_titres": "Outfit",
+        "police_texte": "Outfit",
+        "police_chiffres": "JetBrains Mono",
+        "banniere": "assets/valencia2027.webp",
+        "couleurs": {
+          "primaire": "#1748d6",
+          "primaire_fonce": "#0b2a8f",
+          "secondaire": "#2b8cff",
+          "accent": "#f6b400",
+          "accent_texte": "#5c4100",
+          "fond": "#eef3fc",
+          "surface": "#ffffff",
+          "texte": "#0c1a3d",
+          "texte_doux": "#4e5d7e",
+          "bordure": "#d5deef"
+        }
+      },
+      "epreuves": [
+        { "id": "60m",   "label": "60 m",   "type": "course", "quota": 40,
+          "m": { "ea": "6.58",    "ea_plein_air": { "epreuve": "100 m", "valeur": "10.05" }, "ffa": null },
+          "f": { "ea": "7.17",    "ea_plein_air": { "epreuve": "100 m", "valeur": "11.05" }, "ffa": null } },
+        { "id": "400m",  "label": "400 m",  "type": "course", "quota": 30,
+          "m": { "ea": "45.90",   "ea_plein_air": { "epreuve": "400 m", "valeur": "44.75" }, "ffa": null },
+          "f": { "ea": "51.70",   "ea_plein_air": { "epreuve": "400 m", "valeur": "50.50" }, "ffa": null } },
+        { "id": "800m",  "label": "800 m",  "type": "course", "quota": 30,
+          "m": { "ea": "1:45.60", "ea_plein_air": { "epreuve": "800 m", "valeur": "1:43.00" }, "ffa": null },
+          "f": { "ea": "2:00.40", "ea_plein_air": { "epreuve": "800 m", "valeur": "1:58.00" }, "ffa": null } },
+        { "id": "1500m", "label": "1 500 m", "type": "course", "quota": 26,
+          "m": { "ea": "3:35.50", "ea_plein_air": { "epreuve": "1 500 m", "valeur": "3:31.00" }, "ffa": null },
+          "f": { "ea": "4:05.50", "ea_plein_air": { "epreuve": "1 500 m", "valeur": "4:00.00" }, "ffa": null } },
+        { "id": "3000m", "label": "3 000 m", "type": "course", "quota": 24,
+          "m": { "ea": "7:40.00", "ea_plein_air": { "epreuve": "3 000 m", "valeur": "7:34.00" }, "ffa": null },
+          "f": { "ea": "8:46.00", "ea_plein_air": { "epreuve": "3 000 m", "valeur": "8:37.00" }, "ffa": null } },
+        { "id": "60mH",  "label": "60 m haies", "type": "course", "quota": 32,
+          "m": { "ea": "7.61",    "ea_plein_air": { "epreuve": "110 m haies", "valeur": "13.25" }, "ffa": null },
+          "f": { "ea": "7.95",    "ea_plein_air": { "epreuve": "100 m haies", "valeur": "12.70" }, "ffa": null } },
+        { "id": "hauteur",  "label": "Hauteur",     "type": "concours", "quota": 18,
+          "m": { "ea": "2.29",  "ffa": null }, "f": { "ea": "1.97",  "ffa": null } },
+        { "id": "perche",   "label": "Perche",      "type": "concours", "quota": 18,
+          "m": { "ea": "5.90",  "ffa": null }, "f": { "ea": "4.73",  "ffa": null } },
+        { "id": "longueur", "label": "Longueur",    "type": "concours", "quota": 18,
+          "m": { "ea": "8.17",  "ffa": null }, "f": { "ea": "6.83",  "ffa": null } },
+        { "id": "triple",   "label": "Triple saut", "type": "concours", "quota": 18,
+          "m": { "ea": "17.00", "ffa": null }, "f": { "ea": "14.35", "ffa": null } },
+        { "id": "poids",    "label": "Poids",       "type": "concours", "quota": 18,
+          "m": { "ea": "21.20", "ffa": null }, "f": { "ea": "18.90", "ffa": null } },
+        { "id": "combines", "label": "Épreuves combinées", "type": "combines", "quota": 14,
+          "m": { "label": "Heptathlon", "ea": "6250", "ea_plein_air": { "epreuve": "Décathlon", "valeur": "8550" }, "ffa": null },
+          "f": { "label": "Pentathlon", "ea": "4600", "ea_plein_air": { "epreuve": "Heptathlon", "valeur": "6600" }, "ffa": null } }
+      ],
+      "relais": [
+        { "id": "4x400m", "label": "4 × 400 m", "equipes": 6, "note": "Pas de standard individuel : 6 équipes par épreuve (mixte incluse)." }
+      ]
+    }
+  ]
+}
