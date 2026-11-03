@@ -36,16 +36,20 @@ CHRONO_ELECTRONIQUE_OBLIGATOIRE = {"60m", "400m", "800m", "60mH"}
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Sources par épreuve
-#   mode "salle"           : perf en salle, seuil = standard salle
-#   mode "plein_air"       : même épreuve en plein air, seuil = standard plein air
-#                            (ou standard salle s'il n'y en a pas de distinct : sauts, poids)
-#   mode "plein_air_eq"    : épreuve équivalente (100 m pour le 60 m…), seuil = standard plein air
-#   mode "auto"            : salle et plein air mélangés dans la même liste, la mention "(i)"
-#                            tranche (code FFA unique ; listes WA du 400 m et plus, qui
-#                            contiennent les perfs plein air même en environnement "indoor")
+#   mode "salle"        : épreuve ou code de salle (60 m, 60 m haies, codes FFA « Salle ») :
+#                         toute perf compte avec le standard salle, mention (i) ou pas
+#                         (la FFA ne la met pas sur ses codes salle d'épreuves combinées)
+#   mode "plein_air"    : code FFA plein air d'un concours (seuil : standard unique)
+#   mode "auto"         : salle et plein air dans la même liste, la mention "(i)" tranche :
+#                         standard salle si (i), sinon standard plein air (ou standard
+#                         unique pour les sauts et le poids)
+#   mode "plein_air_eq" : épreuve équivalente (100 m pour le 60 m…), standard plein air
+#
+# WA : les segments indoor / outdoor / all de l'URL renvoient la même liste (vérifié le
+# 03/11/2026) → une seule liste "all" par année civile, la salle se lit à "(i)" dans le lieu.
 # ─────────────────────────────────────────────────────────────────────────────
-def WA(slug, env, mode):
-    return {"src": "WA", "slug": slug, "env": env, "mode": mode}
+def WA(slug, mode):
+    return {"src": "WA", "slug": slug, "mode": mode}
 
 
 def FFA(code, mode):
@@ -53,26 +57,24 @@ def FFA(code, mode):
 
 
 def _course_identique(slug_wa, codes_ffa):
-    sources = [WA(slug_wa, "indoor", "auto"), WA(slug_wa, "outdoor", "auto")]
-    return sources + [FFA(c, m) for c, m in codes_ffa]
+    return [WA(slug_wa, "auto")] + [FFA(c, m) for c, m in codes_ffa]
 
 
 def _concours(slug_wa, code_salle, code_plein_air):
-    return [WA(slug_wa, "indoor", "auto"), WA(slug_wa, "outdoor", "auto"),
-            FFA(code_salle, "salle"), FFA(code_plein_air, "plein_air")]
+    return [WA(slug_wa, "auto"), FFA(code_salle, "salle"), FFA(code_plein_air, "plein_air")]
 
 
 SOURCES = {
-    "60m": {g: [WA("sprints/60-metres", "indoor", "salle"), WA("sprints/100-metres", "outdoor", "plein_air_eq"),
+    "60m": {g: [WA("sprints/60-metres", "salle"), WA("sprints/100-metres", "plein_air_eq"),
                 FFA(106, "salle"), FFA(110, "plein_air_eq")] for g in ("m", "f")},
     "400m":  {g: _course_identique("sprints/400-metres", [(140, "auto")]) for g in ("m", "f")},
     "800m":  {g: _course_identique("middlelong/800-metres", [(208, "auto")]) for g in ("m", "f")},
     "1500m": {g: _course_identique("middlelong/1500-metres", [(215, "auto")]) for g in ("m", "f")},
     "3000m": {g: _course_identique("middlelong/3000-metres", [(230, "auto"), (231, "salle")]) for g in ("m", "f")},
     "60mH": {
-        "m": [WA("hurdles/60-metres-hurdles", "indoor", "salle"), WA("hurdles/110-metres-hurdles", "outdoor", "plein_air_eq"),
+        "m": [WA("hurdles/60-metres-hurdles", "salle"), WA("hurdles/110-metres-hurdles", "plein_air_eq"),
               FFA(354, "salle"), FFA(313, "plein_air_eq")],
-        "f": [WA("hurdles/60-metres-hurdles", "indoor", "salle"), WA("hurdles/100-metres-hurdles", "outdoor", "plein_air_eq"),
+        "f": [WA("hurdles/60-metres-hurdles", "salle"), WA("hurdles/100-metres-hurdles", "plein_air_eq"),
               FFA(351, "salle"), FFA(310, "plein_air_eq")],
     },
     "hauteur":  {g: _concours("jumps/high-jump", 511, 501) for g in ("m", "f")},
@@ -84,9 +86,10 @@ SOURCES = {
         "f": _concours("throws/shot-put", 654, 604),   # 4 kg
     },
     "combines": {
-        "m": [WA("combined-events/heptathlon", "indoor", "salle"), WA("combined-events/decathlon", "outdoor", "plein_air_eq"),
+        # WA n'a pas de liste française des combinées en salle : la FFA s'en charge (716 / 714)
+        "m": [WA("combined-events/heptathlon", "salle"), WA("combined-events/decathlon", "plein_air_eq"),
               FFA(716, "salle"), FFA(710, "plein_air_eq")],
-        "f": [WA("combined-events/pentathlon", "indoor", "salle"), WA("combined-events/heptathlon", "outdoor", "plein_air_eq"),
+        "f": [WA("combined-events/pentathlon", "salle"), WA("combined-events/heptathlon", "plein_air_eq"),
               FFA(714, "salle"), FFA(717, "plein_air_eq")],
     },
 }
@@ -117,11 +120,12 @@ def nettoyer_perf_wa(texte):
 def perf_ffa_vers_wa(texte, type_epreuve):
     """Perf FFA ("6''54 (i) (RP)", "1'45''60", "7m31 (+0.0)", "6250 pts") → (perf WA, salle?, manuel?)."""
     salle = "(i)" in texte
-    t = re.sub(r"\([^)]*\)", " ", texte).strip().split()[0] if texte.strip() else ""
-    t = t.replace("''", '"').replace("’", "'")
-    if type_epreuve == "combines":
-        chiffres = re.sub(r"\D", "", t)
+    sans_mentions = re.sub(r"\([^)]*\)", " ", texte).strip()
+    if type_epreuve == "combines":   # "4 634 pts" : espace des milliers
+        chiffres = re.sub(r"\D", "", sans_mentions)
         return (chiffres or None), salle, False
+    t = sans_mentions.split()[0] if sans_mentions else ""
+    t = t.replace("''", '"').replace("’", "'")
     if type_epreuve == "concours":
         m = re.match(r"^(\d+)[m.,](\d{1,2})$", t)
         return (f"{int(m.group(1))}.{int(m.group(2)):02d}" if m else None), salle, False
@@ -198,24 +202,37 @@ def passe_seuil(v, seuil, type_epreuve):
     return v <= seuil if type_epreuve == "course" else v >= seuil
 
 
-def fetch_wa(slug, env, genre, annee, seuil_large, type_epreuve):
-    """Toplist WA (France, toutes les perfs). S'arrête dès qu'une perf ne passe plus le seuil :
-    la liste est triée par valeur, tout ce qui suit est moins bon."""
+def fetch_wa(slug, genre, annee, seuil_large, type_epreuve, pages_max=10):
+    """Toplist WA d'une année civile : France, salle + plein air, toutes les perfs (pas
+    seulement la meilleure par athlète). Pages de 100 lignes : on les enchaîne et on
+    s'arrête dès qu'une perf ne passe plus le seuil (liste triée par valeur)."""
+    resultats = []
+    for page in range(1, pages_max + 1):
+        lignes, fini = _page_wa(slug, genre, annee, page, seuil_large, type_epreuve)
+        resultats += lignes
+        if fini:
+            break
+    return resultats
+
+
+def _page_wa(slug, genre, annee, page, seuil_large, type_epreuve):
+    """Lit une page de toplist WA. Retourne (perfs, fini) ; fini = rien d'utile après."""
     sexe = "women" if genre == "f" else "men"
-    url = (f"https://worldathletics.org/records/toplists/{slug}/{env}/{sexe}/senior/{annee}"
+    url = (f"https://worldathletics.org/records/toplists/{slug}/all/{sexe}/senior/{annee}"
            "?regionType=countries&region=fra&timing=electronic&windReading=regular"
-           "&page=1&bestResultsOnly=false&maxResultsByCountry=all")
+           f"&page={page}&bestResultsOnly=false&maxResultsByCountry=all")
     r = requests.get(url, headers=HEADERS, timeout=30)
     r.raise_for_status()
     soup = BeautifulSoup(r.content, "html.parser")
     table = soup.find("table", {"class": "records-table"})
-    if not table:
-        return []
+    if not table or not table.find("tbody"):
+        return [], True
     entetes = [th.get_text(strip=True).lower() for th in table.find("thead").find_all("th")]
     col = {nom: entetes.index(nom) for nom in ("mark", "competitor", "dob", "venue", "date") if nom in entetes}
 
     resultats = []
-    for ligne in table.find("tbody").find_all("tr"):
+    lignes = table.find("tbody").find_all("tr")
+    for ligne in lignes:
         cells = ligne.find_all("td")
         if len(cells) <= max(col.values()):
             continue
@@ -225,7 +242,7 @@ def fetch_wa(slug, env, genre, annee, seuil_large, type_epreuve):
         if v is None:
             continue
         if not passe_seuil(v, seuil_large, type_epreuve):
-            break
+            return resultats, True
         dob = re.search(r"(19|20)\d{2}", cells[col["dob"]].get_text()) if "dob" in col else None
         resultats.append({
             "nom": " ".join(cells[col["competitor"]].get_text(" ", strip=True).split()),
@@ -238,11 +255,12 @@ def fetch_wa(slug, env, genre, annee, seuil_large, type_epreuve):
             "salle": "(i)" in lieu_brut,
             "manuel": False,
         })
-    return resultats
+    return resultats, len(lignes) < 100
 
 
 def fetch_ffa(code, genre, annee, seuil_large, type_epreuve):
-    """Bilans FFA (Français uniquement, vent régulier). Même logique d'arrêt anticipé."""
+    """Bilans FFA (Français uniquement, vent régulier). Même logique d'arrêt anticipé.
+    Attention : la FFA ne donne que la meilleure perf de la saison par athlète."""
     url = ("https://www.athle.fr/bases/liste.aspx?frmpostback=true&frmbase=bilans&frmmode=1&frmespace=0"
            f"&frmannee={annee}&frmepreuve={code}&frmsexe={'F' if genre == 'f' else 'M'}"
            "&frmcategorie=&frmdepartement=&frmligue=&frmnationalite=1&frmvent=VR&frmamaxi=")
@@ -300,10 +318,9 @@ def taches_pour(champ):
             if not ep.get(genre) or ep["id"] not in SOURCES:
                 continue
             for src in SOURCES[ep["id"]][genre]:
-                if src["src"] == "WA":
-                    annees = [2026, 2027] if src["env"] == "indoor" else ([2025, 2026] if combine else [2026])
-                else:
-                    annees = [2025, 2026, 2027] if combine else [2026, 2027]
+                # WA : année civile (novembre-décembre 2026 dans la liste 2026) ;
+                # FFA : année de saison (la liste 2026 commence dès septembre 2025)
+                annees = [2025, 2026, 2027] if combine else [2026, 2027]
                 taches += [(ep, genre, src, a) for a in annees]
     return taches
 
@@ -316,7 +333,7 @@ def executer(tache):
     large = max(candidats) if ep["type"] == "course" else min(candidats)
     try:
         if src["src"] == "WA":
-            lignes = fetch_wa(src["slug"], src["env"], genre, annee, large, ep["type"])
+            lignes = fetch_wa(src["slug"], genre, annee, large, ep["type"])
         else:
             lignes = fetch_ffa(src["code"], genre, annee, large, ep["type"])
         return tache, lignes, None
@@ -329,12 +346,12 @@ def qualifiant(ligne, ep, genre, src, periode):
     standard = ep[genre]
     s_salle, s_pa = seuils(standard, src["mode"])
     mode = src["mode"]
+    # La mention (i) n'est fiable que dans les listes mixtes (mode auto) : les codes FFA
+    # « Salle » des combinées ne l'ont jamais, et un 60 m couru dehors reste un 60 m.
     if mode == "auto":
         mode = "salle" if ligne["salle"] else "plein_air"
-    elif mode == "salle" and not ligne["salle"] and ep["id"] not in ("60m", "60mH"):
-        return None   # source "salle" mais perf sans (i) : on ne la classe pas au hasard
-    elif mode.startswith("plein_air") and ligne["salle"]:
-        return None   # perf en salle dans une liste plein air : comptée par la source salle
+    elif mode == "plein_air_eq" and ligne["salle"]:
+        return None   # ex. 100 m couru en salle : ce n'est pas l'équivalence prévue
     seuil = s_salle if mode == "salle" else s_pa
     if not passe_seuil(ligne["valeur"], seuil, ep["type"]):
         return None

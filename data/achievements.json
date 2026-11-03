@@ -1,5 +1,5 @@
 {
- "maj": "2026-11-03T14:20+01:00",
+ "maj": "2026-11-03T19:10+01:00",
  "championnats": {
   "eic2027": {
    "m": {
@@ -289,6 +289,26 @@
       "lieu": "Paris (FRA)",
       "source": "WA",
       "condition": "plein_air",
+      "epreuve_realisee": null
+     }
+    ],
+    "combines": [
+     {
+      "nom": "Auriana LAZRAQ KHLASS",
+      "perf": "4634",
+      "date": "2026-02-28",
+      "lieu": "Aubiere",
+      "source": "FFA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Leonie CAMBOURS",
+      "perf": "4608",
+      "date": "2026-02-28",
+      "lieu": "Aubiere",
+      "source": "FFA",
+      "condition": "salle",
       "epreuve_realisee": null
      }
     ],

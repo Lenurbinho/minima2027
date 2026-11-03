@@ -18,7 +18,7 @@ Les championnats jeunes de l'été 2027 s'ajouteront comme onglets supplémentai
 - ⏳ **Minima et modalités FFA : pas encore publiés** — l'utilisateur les fournira.
   Champ `ffa: null` partout et `minima_ffa_publies: false`.
 - ✅ `scraper.py` (03/11/2026) : WA + FFA, salle + plein air, testé en réel (~1 min,
-  162 requêtes, 32 qualifiés sur les standards EA, perfs de l'été 2026 et de fin d'hiver 2026).
+  152 requêtes, 34 qualifiés sur les standards EA, perfs de l'été 2026 et de fin d'hiver 2026).
 - ⏳ Pas encore de workflow GitHub Actions (lancement manuel : `python scraper.py`).
 
 ## Architecture
@@ -80,27 +80,27 @@ Déjà saisi dans `championnats.json`. Points qui comptent pour le scraper :
 ## Leçons apprises en 2026 (ne pas réapprendre à la dure)
 
 ### World Athletics (toplists)
-- URL type : `https://worldathletics.org/records/toplists/{famille}/{slug}/{environnement}/{men|women}/{senior|u20|u18}/{année}?regionType=countries&region=fra&timing=electronic&windReading=regular&page=1&bestResultsOnly=false&maxResultsByCountry=all`
+- URL type : `https://worldathletics.org/records/toplists/{famille}/{slug}/all/{men|women}/{senior|u20|u18}/{année}?regionType=countries&region=fra&timing=electronic&windReading=regular&page={n}&bestResultsOnly=false&maxResultsByCountry=all`
+  - Bilans WA en **année civile** : novembre-décembre 2026 sont dans la liste 2026,
+    janvier-février 2027 dans la liste 2027 → interroger les deux.
   - `bestResultsOnly=false` est **indispensable** : sinon seule la meilleure perf de
     l'année apparaît, et un athlète dont le record de saison est hors période mais qui a
     une perf qualifiante dans la période est oublié (cas Thibaut Collet à la perche, 2026).
   - La liste est triée par perf : **`break` dès qu'une perf ne passe plus le seuil**
     (le scraping est passé de 15 min à 6 min). Mais **`continue`** (pas `break`) quand
     seule la date est hors période : une perf moins bonne plus bas peut être dans la période.
-  - Ne lire que `page=1` fonctionnait en 2026 pour la France ; à vérifier si des épreuves
-    très fournies (60 m) dépassent une page.
-- Vérifié le 03/11/2026 : le segment `{environnement}` vaut `indoor` / `outdoor`, mais
-  **la liste `indoor` du 400 m et plus contient aussi les perfs plein air** (et inversement).
-  Seule la mention `(i)` à la fin du lieu est fiable pour savoir si une perf est en salle :
-  le scraper s'en sert (mode `auto`). Sans ça, des perfs plein air passaient avec le
-  standard salle, plus facile (faux qualifiés au 400 m, 800 m, 1500 m).
+  - Pages de 100 lignes : le scraper enchaîne les pages tant que la dernière perf passe
+    encore le seuil (la page 2 existe bien, ex. 400 m hommes 2026).
+- Vérifié le 03/11/2026 : les segments `indoor`, `outdoor` et `all` renvoient **la même
+  liste** (salle + plein air mélangés). Seule la mention `(i)` à la fin du lieu dit si une
+  perf est en salle : le scraper s'en sert (mode `auto`). Sans ça, des perfs plein air
+  passaient avec le standard salle, plus facile (faux qualifiés au 400 m, 800 m, 1500 m).
 - Noms WA déjà au format `Prénom NOM` (NOM en majuscules). Lieu : `Stade, Ville (PAYS) (i)`.
 - 100 lignes par page, page 1 seulement : suffisant pour des standards de ce niveau.
 - Combinées en salle (`combined-events/heptathlon` / `pentathlon` en `indoor`) : liste
   vide, même sans filtre pays. Le plein air (`decathlon`, `heptathlon`) fonctionne.
   En salle, on compte sur la FFA (codes 716 / 714).
-- **À vérifier en décembre** : la liste WA « 2027 » en salle reprend-elle les meetings de
-  décembre 2026 ? (vide au 03/11/2026, le scraper interroge 2026 et 2027).
+- La liste WA 2027 est vide au 03/11/2026 (normal, année civile).
 - WA peut renvoyer des tableaux vides tôt le matin (maintenance) : le run de 6h56 du
   26/06/2026 a raté une qualifiée que le run suivant a trouvée. → voir « Garde-fous ».
 
@@ -110,15 +110,19 @@ Déjà saisi dans `championnats.json`. Points qui comptent pour le scraper :
   - `frmcategorie` : vide = toutes, `JU` = U20, `CA` = U18, `ES` = U23.
   - `frmnationalite=1` : Français uniquement (indispensable).
   - `frmespace` n'a **aucun effet**. Salle et plein air partagent le code pour les courses
-    du 400 m et plus ; les perfs en salle sont suffixées `(i)` (`6''54 (i) (RP)`). Codes
+    du 400 m et plus ; les perfs en salle y sont suffixées `(i)` (`6''54 (i) (RP)`). Codes
     propres à la salle : 60 m 106, 60 m haies 354 (H) / 351 (F), 3000 m piste courte 231,
     sauts 511–514, poids 657 (H) / 654 (F), heptathlon H 716, pentathlon F 714.
+  - **La mention `(i)` n'existe pas partout** : jamais sur les codes salle des combinées
+    (716, 714), et un 60 m couru dehors n'en a pas. Elle ne sert donc qu'à départager les
+    codes mixtes ; sur un code salle, toute perf est une perf de salle.
+  - Les combinées s'écrivent avec une espace des milliers : `4 634 pts`.
+  - **Une seule perf par athlète** (sa meilleure de la saison), contrairement à WA avec
+    `bestResultsOnly=false` : seul WA rattrape une perf qualifiante qui n'est pas la meilleure.
   - L'année FFA n'est pas l'année civile : la liste « 2026 » contient des perfs de
     septembre 2025. Le filtre de période fait le tri ; le scraper interroge 2026 et 2027.
   - Les prénoms longs sont tronqués (`KOUNTA Muhammad Abdall`) : la clé de
     dédoublonnage n'utilise que le NOM et le premier prénom.
-  - **À vérifier** : la FFA donne-t-elle une ou plusieurs perfs par athlète ? Si une seule,
-    seul WA (`bestResultsOnly=false`) rattrape une perf qualifiante qui n'est pas la meilleure.
 - Codes d'épreuve `frmepreuve` : `references/Dictionnaire_Epreuves_FFA.xlsx` (colonnes
   M-CA, M-JU, M-ES, F-CA… = catégories concernées). Les codes dépendent du **poids de
   l'engin / hauteur des haies** : un mauvais code ramène des seniors en U18 (bug 2026 :
