@@ -141,9 +141,11 @@ Déjà saisi dans `championnats.json`. Points qui comptent pour le scraper :
 
 ### GitHub Actions
 - Le `schedule` (cron) de GitHub est peu fiable (retards de plusieurs heures, runs sautés).
-  Solution 2026 : tâche planifiée Claude Code à 7h30 qui déclenche `workflow_dispatch`.
-  Alternative robuste : un service de cron externe (ex. cron-job.org) qui appelle l'API
-  `workflow_dispatch` avec un jeton à droits limités.
+  Solution 2026 : tâche planifiée Claude Code à 7h30 qui déclenche `workflow_dispatch`,
+  mais elle ne tourne que si l'application est ouverte sur le PC de l'utilisateur.
+  **Solution 2027** (souhait de l'utilisateur : zéro PC, zéro action) : 3 créneaux cron dans
+  la matinée ; chaque créneau s'arrête tout de suite si un créneau du jour a déjà réussi.
+  Ne pas revenir à une tâche planifiée locale.
 - Prévoir `timeout-minutes: 30`.
 - Travailler avec **git normalement** (clone local, commit, push). En 2026 le dossier
   local n'était pas un dépôt git et on poussait via l'API GitHub fichier par fichier.
@@ -155,10 +157,9 @@ Déjà saisi dans `championnats.json`. Points qui comptent pour le scraper :
    aujourd'hui) et pistes surdimensionnées (pour l'instant traitées comme de la salle).
 2. **Minima FFA** : intégrer dès que l'utilisateur les fournit (nouveaux champs dans
    `championnats.json`, colonne « Minima FFA » déjà prévue sur le site).
-3. ✅ **Mise à jour quotidienne** : `.github/workflows/mise-a-jour.yml` (cron 06:35 UTC +
-   lancement manuel, ~1 min 15 s, résumé dans l'onglet Actions). Le cron GitHub étant peu
-   fiable, une tâche planifiée Claude Code de secours (vérifier à 9h qu'un run a réussi
-   dans la journée, sinon le relancer) reste à valider par l'utilisateur.
+3. ✅ **Mise à jour quotidienne** : `.github/workflows/mise-a-jour.yml`, entièrement sur
+   GitHub (cron 06:35, 08:17 et 10:47 UTC avec arrêt si déjà fait + lancement manuel,
+   ~1 min 15 s, résumé dans l'onglet Actions).
 4. ✅ **Garde-fous** (`scraper.py`) : une source en erreur, ou une épreuve qui tombe à zéro
    qualifié alors qu'elle en avait, garde les athlètes du run précédent. Conséquence : un
    faux positif ne disparaît pas tout seul, il faut l'enlever de `achievements.json` à la

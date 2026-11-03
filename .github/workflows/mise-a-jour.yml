@@ -1,18 +1,24 @@
 name: Mise à jour des minima 2027
 
-# Lancement :
-#   • chaque matin par le cron ci-dessous (GitHub le décale parfois d'une heure ou plus,
-#     voire le saute : une tâche planifiée Claude Code relance en secours si besoin)
+# Lancement entièrement automatique, sans PC allumé :
+#   • 3 créneaux le matin. Le cron de GitHub est parfois retardé ou sauté : chaque créneau
+#     vérifie d'abord si un créneau précédent a déjà réussi aujourd'hui, et ne fait rien
+#     dans ce cas. Un créneau sauté ou en échec est ainsi rattrapé par le suivant.
 #   • à la main : onglet Actions → "Run workflow", ou `gh workflow run mise-a-jour.yml`
+#     (un lancement manuel tourne toujours et n'empêche pas ceux du matin).
 on:
   workflow_dispatch:
   schedule:
-    - cron: '35 6 * * *'   # 06:35 UTC = 07:35 à Paris l'hiver, 08:35 l'été
+    - cron: '35 6 * * *'    # 07:35 à Paris l'hiver (08:35 l'été)
+    - cron: '17 8 * * *'    # rattrapage 09:17
+    - cron: '47 10 * * *'   # rattrapage 11:47
 
 permissions:
   contents: write
+  actions: read
 
-# Deux lancements rapprochés (cron + secours) ne tournent jamais en même temps
+# Deux lancements rapprochés ne tournent jamais en même temps : le second attend,
+# puis voit que le premier a réussi et s'arrête.
 concurrency:
   group: mise-a-jour-minima
   cancel-in-progress: false
@@ -24,23 +30,46 @@ jobs:
     env:
       TZ: Europe/Paris
       PYTHONIOENCODING: utf-8
+      GH_TOKEN: ${{ github.token }}
 
     steps:
+      - name: Déjà mis à jour aujourd'hui ?
+        id: deja
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "fait=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          jour=$(date -u +%F)
+          n=$(gh run list --repo "${{ github.repository }}" --workflow mise-a-jour.yml \
+                --status success --limit 30 --json createdAt,event \
+                --jq "[.[] | select(.event == \"schedule\" and (.createdAt | startswith(\"$jour\")))] | length")
+          if [ "$n" -gt 0 ]; then
+            echo "Mise à jour du jour déjà faite par un créneau précédent : rien à faire."
+            echo "fait=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "fait=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Récupération du dépôt
+        if: steps.deja.outputs.fait != 'true'
         uses: actions/checkout@v5
 
       - name: Python
+        if: steps.deja.outputs.fait != 'true'
         uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
       - name: Dépendances
+        if: steps.deja.outputs.fait != 'true'
         run: pip install requests beautifulsoup4
 
       - name: Scraping WA + FFA
+        if: steps.deja.outputs.fait != 'true'
         run: python scraper.py | tee scraping.log
 
       - name: Résumé du run
+        if: steps.deja.outputs.fait != 'true'
         run: |
           {
             echo "### Minima 2027 — $(date +'%d/%m/%Y %H:%M')"
@@ -48,6 +77,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publication des résultats
+        if: steps.deja.outputs.fait != 'true'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
