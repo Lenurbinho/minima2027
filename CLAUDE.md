@@ -19,7 +19,8 @@ Les championnats jeunes de l'été 2027 s'ajouteront comme onglets supplémentai
   Champ `ffa: null` partout et `minima_ffa_publies: false`.
 - ✅ `scraper.py` (03/11/2026) : WA + FFA, salle + plein air, testé en réel (~1 min,
   152 requêtes, 34 qualifiés sur les standards EA, perfs de l'été 2026 et de fin d'hiver 2026).
-- ⏳ Pas encore de workflow GitHub Actions (lancement manuel : `python scraper.py`).
+- ✅ Workflow quotidien GitHub Actions `mise-a-jour.yml` (03/11/2026), garde-fous et
+  détection des nouveaux qualifiés.
 
 ## Architecture
 
@@ -154,10 +155,14 @@ Déjà saisi dans `championnats.json`. Points qui comptent pour le scraper :
    aujourd'hui) et pistes surdimensionnées (pour l'instant traitées comme de la salle).
 2. **Minima FFA** : intégrer dès que l'utilisateur les fournit (nouveaux champs dans
    `championnats.json`, colonne « Minima FFA » déjà prévue sur le site).
-3. **Mise à jour quotidienne fiable** + workflow GitHub Actions.
-4. **Garde-fous** : ne jamais écraser `achievements.json` par un résultat plus pauvre
-   (ex. si une épreuve qui avait des qualifiés en renvoie zéro, ou si WA renvoie trop de
-   tableaux vides) : réessayer plus tard et garder les anciennes données.
+3. ✅ **Mise à jour quotidienne** : `.github/workflows/mise-a-jour.yml` (cron 06:35 UTC +
+   lancement manuel, ~1 min 15 s, résumé dans l'onglet Actions). Le cron GitHub étant peu
+   fiable, une tâche planifiée Claude Code de secours (vérifier à 9h qu'un run a réussi
+   dans la journée, sinon le relancer) reste à valider par l'utilisateur.
+4. ✅ **Garde-fous** (`scraper.py`) : une source en erreur, ou une épreuve qui tombe à zéro
+   qualifié alors qu'elle en avait, garde les athlètes du run précédent. Conséquence : un
+   faux positif ne disparaît pas tout seul, il faut l'enlever de `achievements.json` à la
+   main. Chaque run liste aussi les nouveaux qualifiés (ligne `🆕`).
 5. **Noms harmonisés `Prénom NOM`** quelle que soit la source (NOM en majuscules ;
    attention aux noms composés et particules : `Le Clezio`, `De Oliveira`…).
 6. **Doublons** : un athlète = une ligne par épreuve, avec sa meilleure perf valable.
@@ -176,5 +181,5 @@ Déjà saisi dans `championnats.json`. Points qui comptent pour le scraper :
   qui a motivé le changement.
 - Prévisualiser le site en local : `python -m http.server 8027` à la racine (le site lit
   ses JSON par `fetch()`, il ne marche pas en double-cliquant sur `index.html`).
-- Après chaque modification validée : commit + push sur `main`, et relancer le workflow
-  de mise à jour quand il existera.
+- Après chaque modification validée : commit + push sur `main`, puis relancer le workflow
+  (`gh workflow run mise-a-jour.yml --repo Lenurbinho/minima2027`).
