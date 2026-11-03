@@ -394,7 +394,7 @@ def main():
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
     ancien = json.loads(SORTIE.read_text(encoding="utf-8")) if SORTIE.exists() else {}
     sortie = {"maj": datetime.now().astimezone().isoformat(timespec="minutes"), "championnats": {}}
-    erreurs = []
+    erreurs, avertissements, nouveaux = [], [], []
 
     for champ in config["championnats"]:
         taches = taches_pour(champ)
@@ -421,10 +421,18 @@ def main():
                     cle = cle_athlete(q["nom"])
                     athletes[cle] = meilleure(athletes[cle], q, ep["type"]) if cle in athletes else q
 
-        # Garde-fou : si une source a échoué, on réintègre les athlètes du run précédent
-        # pour cette épreuve plutôt que de les faire disparaître du site.
+        # Garde-fous : on réintègre les athlètes du run précédent pour une épreuve si une
+        # source a échoué, ou si l'épreuve tombe à zéro qualifié alors qu'elle en avait.
+        # La période de qualification est fixe : un qualifié ne perd pas son standard, une
+        # chute à zéro vient d'une source qui a mal répondu (ex. WA en maintenance le matin).
+        # Pour retirer volontairement un athlète (faux positif corrigé), éditer achievements.json.
         precedent = ancien.get("championnats", {}).get(champ["id"], {})
-        for genre, id_ep in en_echec:
+        tombees_a_zero = {(g, id_ep) for g in ("m", "f") for id_ep, liste in precedent.get(g, {}).items()
+                          if liste and not par_epreuve.get((g, id_ep))}
+        for genre, id_ep in sorted(tombees_a_zero - en_echec):
+            avertissements.append(f"{champ['id']} {genre} {id_ep} : 0 qualifié au lieu de "
+                                  f"{len(precedent[genre][id_ep])}, données précédentes conservées")
+        for genre, id_ep in en_echec | tombees_a_zero:
             athletes = par_epreuve.setdefault((genre, id_ep), {})
             for a in precedent.get(genre, {}).get(id_ep, []):
                 a = {**a, "valeur": valeur(a["perf"])}
@@ -442,10 +450,16 @@ def main():
             resultat[genre][id_ep] = [{k: v for k, v in a.items() if k != "valeur"} for a in liste]
             print(f"  {genre.upper()} {id_ep:<9} {len(liste)} qualifié(s) : "
                   + ", ".join(f"{a['nom']} {a['perf']}" for a in liste))
+            deja = {cle_athlete(a["nom"]) for a in precedent.get(genre, {}).get(id_ep, [])}
+            nouveaux += [f"{a['nom']} ({id_ep} {'H' if genre == 'm' else 'F'}, {a['perf']})"
+                         for a in liste if cle_athlete(a["nom"]) not in deja]
         sortie["championnats"][champ["id"]] = resultat
 
     SORTIE.write_text(json.dumps(sortie, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"\n✅ {SORTIE.relative_to(RACINE)} écrit ({sortie['maj']})")
+    print(f"🆕 Nouveaux qualifiés : {', '.join(nouveaux)}" if nouveaux else "🆕 Aucun nouveau qualifié")
+    for a in avertissements:
+        print(f"⚠️ {a}")
     if erreurs:
         print(f"⚠️ {len(erreurs)} requête(s) en échec (données précédentes conservées pour ces épreuves) :")
         for e in erreurs:

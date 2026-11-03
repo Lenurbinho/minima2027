@@ -1,0 +1,61 @@
+name: Mise à jour des minima 2027
+
+# Lancement :
+#   • chaque matin par le cron ci-dessous (GitHub le décale parfois d'une heure ou plus,
+#     voire le saute : une tâche planifiée Claude Code relance en secours si besoin)
+#   • à la main : onglet Actions → "Run workflow", ou `gh workflow run mise-a-jour.yml`
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '35 6 * * *'   # 06:35 UTC = 07:35 à Paris l'hiver, 08:35 l'été
+
+permissions:
+  contents: write
+
+# Deux lancements rapprochés (cron + secours) ne tournent jamais en même temps
+concurrency:
+  group: mise-a-jour-minima
+  cancel-in-progress: false
+
+jobs:
+  scraping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TZ: Europe/Paris
+      PYTHONIOENCODING: utf-8
+
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v5
+
+      - name: Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Dépendances
+        run: pip install requests beautifulsoup4
+
+      - name: Scraping WA + FFA
+        run: python scraper.py | tee scraping.log
+
+      - name: Résumé du run
+        run: |
+          {
+            echo "### Minima 2027 — $(date +'%d/%m/%Y %H:%M')"
+            grep -E "qualifié|🆕|⚠️" scraping.log | sed 's/^/- /'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publication des résultats
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/achievements.json
+          if git diff --staged --quiet; then
+            echo "Aucun changement"
+            exit 0
+          fi
+          git commit -m "Minima mis à jour – $(date +'%d/%m/%Y %H:%M')"
+          git pull --rebase --quiet
+          git push
