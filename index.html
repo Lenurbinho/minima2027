@@ -202,6 +202,87 @@ h1 {
   .std .g { display: block; }
   .frise li { grid-template-columns: 96px 1fr; }
 }
+
+/* ── Bouton fiche PDF ── */
+.entete-droite { display: flex; flex-direction: column; gap: 8px; min-width: 220px; }
+.btn-pdf {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 0; border-radius: var(--rayon); padding: 10px 14px; cursor: pointer;
+  background: var(--accent); color: var(--accent-texte); font: 700 .92rem var(--police-texte);
+}
+.btn-pdf:hover { filter: brightness(1.05); }
+.btn-pdf:disabled { opacity: .6; cursor: progress; }
+.btn-pdf svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* ── Fiche PDF : A4 paysage (1123 × 794 px), rendue hors écran puis convertie.
+   Pas de color-mix() ici : html2canvas ne sait pas le lire (teintes calculées en JS). ── */
+.fx-hors-ecran { position: absolute; left: -20000px; top: 0; }
+.fx {
+  width: 1123px; height: 794px; box-sizing: border-box; padding: 20px 22px 14px;
+  background: #fff; color: var(--fx-texte); font-family: var(--police-texte); line-height: 1.3;
+  display: flex; flex-direction: column; gap: 8px; overflow: hidden;
+}
+.fx-tete {
+  display: grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: center;
+  background: linear-gradient(135deg, var(--fx-pf), var(--fx-p) 60%, var(--fx-s));
+  color: #fff; border-radius: 12px; padding: 10px 12px 10px 18px;
+}
+.fx-surtitre { font-size: 9.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--fx-a); }
+.fx-titre { font-family: var(--police-titres); font-size: 23px; font-weight: 800; line-height: 1.1; margin: 3px 0 4px; }
+.fx-meta { font-size: 11.5px; }
+.fx-chiffres { display: flex; gap: 8px; }
+.fx-chiffre {
+  background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.28);
+  border-radius: 9px; padding: 6px 10px; text-align: center; min-width: 76px;
+}
+.fx-chiffre b { display: block; font-family: var(--police-chiffres); font-size: 21px; line-height: 1.15; }
+.fx-chiffre span { font-size: 9.5px; }
+.fx-logo { width: 126px; height: 84px; border-radius: 8px; background-size: cover; background-position: center; }
+.fx-bandeau {
+  display: flex; justify-content: space-between; gap: 16px; font-size: 10.5px;
+  background: var(--fx-a-clair); border-left: 4px solid var(--fx-a); border-radius: 6px;
+  padding: 5px 10px; color: var(--fx-a-texte);
+}
+.fx-corps { flex: 1; min-height: 0; overflow: hidden; }
+.fx-grille { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+.fx-col-titre {
+  display: flex; justify-content: space-between; align-items: baseline;
+  background: var(--fx-pf); color: #fff; border-radius: 7px 7px 0 0; padding: .35em .75em;
+  font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+}
+.fx-col-titre span + span { color: var(--fx-a); }
+.fx-ligne { display: grid; grid-template-columns: 10.6em 1fr; border: 1px solid var(--fx-bord); border-top: 0; }
+.fx-ligne:nth-child(odd) { background: var(--fx-zebre); }
+.fx-ep { padding: .3em .6em; border-right: 1px solid var(--fx-bord); }
+.fx-ep1 { display: flex; justify-content: space-between; align-items: baseline; gap: .4em; }
+.fx-ep1 b { font-family: var(--police-titres); font-size: 1.08em; }
+.fx-quota { font-size: .72em; color: var(--fx-doux); white-space: nowrap; }
+.fx-ep2 { white-space: nowrap; }
+.fx-std { font-family: var(--police-chiffres); font-weight: 700; color: var(--fx-p); font-size: .92em; }
+.fx-pa { font-size: .78em; color: var(--fx-doux); }
+.fx-ath { padding: .3em .6em; display: flex; flex-direction: column; justify-content: center; gap: .15em; }
+.fx-a { display: grid; grid-template-columns: minmax(0, 1.2fr) 4.9em minmax(0, 1.25fr); gap: .5em; align-items: baseline; }
+.fx-nom { font-weight: 700; }
+.fx-perf { font-family: var(--police-chiffres); font-weight: 700; color: var(--fx-pf); }
+.fx-ctx { font-size: .8em; color: var(--fx-doux); }
+.fx-tag {
+  font-size: .9em; font-weight: 700; background: var(--fx-a); color: var(--fx-a-texte);
+  border-radius: 99px; padding: 0 .45em; margin-right: .35em; white-space: nowrap;
+}
+.fx-vide { color: #a3adc4; }
+/* Mode condensé (beaucoup de qualifiés) : 2 athlètes par ligne, sans date ni lieu */
+.fx-note-compact { display: none; }
+.fx-compact .fx-note-compact { display: inline; }
+.fx-compact .fx-ath { display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.2em; align-content: center; }
+.fx-compact .fx-a { grid-template-columns: minmax(0, 1fr) auto auto; gap: .4em; }
+.fx-compact .fx-lieu { display: none; }
+.fx-compact .fx-tag { margin-right: 0; }
+.fx-pied {
+  display: grid; grid-template-columns: 1.7fr 1fr; gap: 16px; font-size: 9.5px; color: var(--fx-doux);
+  border-top: 1px solid var(--fx-bord); padding-top: 6px;
+}
+.fx-pied b { color: var(--fx-texte); }
+.fx-pied > div + div { text-align: right; }
 </style>
 </head>
 <body>
@@ -213,10 +294,16 @@ h1 {
       <div class="surtitre">FFA · Équipe de France</div>
       <h1 id="titre-saison">Minima réalisés — Hiver 2027</h1>
     </div>
-    <div class="maj jamais" id="maj">
-      <span class="point"></span>Dernière mise à jour
-      <strong id="maj-date">—</strong>
-      Sources : <a href="https://worldathletics.org" target="_blank" rel="noopener">World Athletics</a> &amp; <a href="https://www.athle.fr/" target="_blank" rel="noopener">FFA</a>
+    <div class="entete-droite">
+      <div class="maj jamais" id="maj">
+        <span class="point"></span>Dernière mise à jour
+        <strong id="maj-date">—</strong>
+        Sources : <a href="https://worldathletics.org" target="_blank" rel="noopener">World Athletics</a> &amp; <a href="https://www.athle.fr/" target="_blank" rel="noopener">FFA</a>
+      </div>
+      <button class="btn-pdf" id="btn-pdf" type="button" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2.5A1.5 1.5 0 0 0 5.5 21h13a1.5 1.5 0 0 0 1.5-1.5V17"/></svg>
+        <span>Fiche PDF (1 page)</span>
+      </button>
     </div>
   </header>
 
@@ -392,6 +479,187 @@ function rendreChampionnat(ch) {
   }));
 }
 
+/* ── Fiche PDF pour le speaker : A4 paysage, toujours une seule page ──
+   La fiche est construite hors écran avec la charte du championnat, sa taille de texte
+   s'ajuste pour tout faire tenir, puis elle est convertie en image dans un PDF. */
+const LIBS_PDF = [
+  'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+];
+let libsPdf = null;   // chargées au premier clic seulement
+
+function chargerScript(src) {
+  return new Promise((ok, ko) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = ok;
+    s.onerror = () => ko(new Error(`Chargement impossible : ${src}`));
+    document.head.appendChild(s);
+  });
+}
+
+function rgba(hex, alpha) {
+  const n = parseInt(String(hex).replace('#', ''), 16);
+  return `rgba(${n >> 16}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+}
+
+function dateCourte(iso) {
+  const d = jour(iso);
+  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(2)}`;
+}
+
+function ligneFiche(ch, ep, g) {
+  const s = ep[g];
+  // Standards sans « pts » pour rester sur une ligne ; l'épreuve équivalente plein air
+  // figure sur le badge PA de l'athlète concerné.
+  const val = v => ep.type === 'combines' ? v : perf(v, ep.type);
+  const standard = s.ffa ? `FFA ${val(s.ffa)} · EA ${val(s.ea)}` : val(s.ea);
+  const pleinAir = s.ea_plein_air ? ` · PA ${val(s.ea_plein_air.valeur)}` : '';
+  const liste = athletesDe(ch.id, g, ep.id);
+  const athletes = liste.length ? liste.map(a => {
+    const tag = a.condition === 'plein_air' ? `<span class="fx-tag">PA${a.epreuve_realisee ? ' ' + esc(a.epreuve_realisee) : ''}</span>` : '';
+    const contexte = [a.date ? dateCourte(a.date) : '', a.lieu || ''].filter(Boolean).join(' · ');
+    return `<div class="fx-a">
+        <span class="fx-nom">${esc(a.nom)}</span>
+        <span class="fx-perf">${esc(perf(a.perf, ep.type))}</span>
+        <span class="fx-ctx">${tag}<span class="fx-lieu">${esc(contexte)}</span></span>
+      </div>`;
+  }).join('') : '<span class="fx-vide">—</span>';
+  return `<div class="fx-ligne">
+      <div class="fx-ep">
+        <div class="fx-ep1"><b>${esc(s.label || ep.label)}</b><span class="fx-quota">${ep.quota} places</span></div>
+        <div class="fx-ep2"><span class="fx-std">${esc(standard)}</span><span class="fx-pa">${esc(pleinAir)}</span></div>
+      </div>
+      <div class="fx-ath">${athletes}</div>
+    </div>`;
+}
+
+function ficheHTML(ch) {
+  const c = ch.theme?.couleurs || {};
+  const coul = (cle, defaut) => c[cle] || defaut;
+  const variables = [
+    ['--fx-p', coul('primaire', '#1748d6')], ['--fx-pf', coul('primaire_fonce', '#0b2a8f')],
+    ['--fx-s', coul('secondaire', '#2b8cff')], ['--fx-a', coul('accent', '#f6b400')],
+    ['--fx-a-texte', coul('accent_texte', '#5c4100')], ['--fx-a-clair', rgba(coul('accent', '#f6b400'), .16)],
+    ['--fx-texte', coul('texte', '#0c1a3d')], ['--fx-doux', coul('texte_doux', '#4e5d7e')],
+    ['--fx-bord', coul('bordure', '#d5deef')], ['--fx-zebre', rgba(coul('primaire', '#1748d6'), .045)],
+  ].map(([k, v]) => `${k}:${v}`).join(';');
+
+  const auj = aujourdhui();
+  const jours = Math.round((jour(ch.debut) - auj) / 86400000);
+  const compte = jours > 0 ? `J-${jours}` : (auj <= jour(ch.fin) ? 'En cours' : 'Terminé');
+  const nb = g => new Set(ch.epreuves.flatMap(ep => athletesDe(ch.id, g, ep.id).map(a => a.nom))).size;
+  const colonne = g => `<div>
+      <div class="fx-col-titre"><span>${g === 'm' ? 'Hommes' : 'Femmes'}</span><span>${nb(g)} qualifié${g === 'f' ? 'e' : ''}${nb(g) > 1 ? 's' : ''}</span></div>
+      ${ch.epreuves.filter(ep => ep[g]).map(ep => ligneFiche(ch, ep, g)).join('')}
+    </div>`;
+
+  const p = ch.periodes.standards, pc = ch.periodes.standards_combines;
+  const prochaines = ch.dates_cles.filter(d => jour(d.fin || d.date) >= auj).slice(0, 4)
+    .map(d => `<b>${dateFr(d.date, true).slice(0, 5)}</b> ${esc(d.label)}`).join(' · ');
+  const maj = ETAT.resultats?.maj
+    ? new Date(ETAT.resultats.maj).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
+  const banniere = ch.theme?.banniere;
+
+  return `<div class="fx" style="${variables}">
+    <div class="fx-tete">
+      <div>
+        <div class="fx-surtitre">FFA · Équipe de France · Fiche speaker</div>
+        <div class="fx-titre">${esc(ch.nom)} — ${esc(ch.ville)} ${jour(ch.debut).getFullYear()}</div>
+        <div class="fx-meta">${jour(ch.debut).getDate()}–${dateFr(ch.fin)} · ${esc(ch.lieu)} · ${esc(ch.categorie)}</div>
+      </div>
+      <div class="fx-chiffres">
+        <div class="fx-chiffre"><b>${compte}</b><span>avant le début</span></div>
+        <div class="fx-chiffre"><b>${nb('m')}</b><span>hommes</span></div>
+        <div class="fx-chiffre"><b>${nb('f')}</b><span>femmes</span></div>
+      </div>
+      ${banniere ? `<div class="fx-logo" style="background-image:url('${esc(banniere)}')"></div>` : ''}
+    </div>
+    <div class="fx-bandeau">
+      <span><b>${ch.minima_ffa_publies ? 'Minima FFA et standards European Athletics' : 'Standards European Athletics'}</b>${ch.minima_ffa_publies ? '' : ' (minima FFA pas encore publiés)'}</span>
+      <span>Période : ${dateFr(p.debut, true)} → ${dateFr(p.fin, true)}${pc ? ` (combinées dès le ${dateFr(pc.debut, true)})` : ''}</span>
+      <span><b>PA</b> = standard / perf en plein air (épreuve équivalente sur le badge)</span>
+    </div>
+    <div class="fx-corps"><div class="fx-grille">${colonne('m')}${colonne('f')}</div></div>
+    <div class="fx-pied">
+      <div>${prochaines ? `À venir : ${prochaines}` : ''}</div>
+      <div><span class="fx-note-compact"><b>Fiche condensée :</b> dates et lieux des perfs sur le site · </span>Mise à jour : <b>${esc(maj)}</b> · lenurbinho.github.io/minima2027<br>Alexandre BRUNEL – Groupe d'animation FFA · Sources World Athletics &amp; FFA</div>
+    </div>
+  </div>`;
+}
+
+// Taille de texte la plus grande qui tient dans la page. Sous 9 px, on passe en mode
+// condensé (2 athlètes par ligne, sans date ni lieu) ; en dernier recours, le bloc entier
+// est réduit : la fiche ne dépasse jamais une page.
+function ajusterFiche(fiche) {
+  const corps = fiche.querySelector('.fx-corps');
+  const grille = fiche.querySelector('.fx-grille');
+  const deborde = () => grille.offsetHeight > corps.clientHeight;
+  const essayer = minimum => {
+    let taille = 14;
+    grille.style.fontSize = `${taille}px`;
+    while (deborde() && taille > minimum) {
+      taille -= 0.25;
+      grille.style.fontSize = `${taille}px`;
+    }
+  };
+  essayer(9);
+  if (deborde()) {
+    fiche.classList.add('fx-compact');
+    essayer(7.5);
+  }
+  if (deborde()) {
+    const r = corps.clientHeight / grille.offsetHeight;
+    grille.style.transformOrigin = 'top left';
+    grille.style.transform = `scale(${r})`;
+    grille.style.width = `${100 / r}%`;
+  }
+}
+
+async function canvasFiche(ch) {
+  libsPdf ??= Promise.all(LIBS_PDF.map(chargerScript)).catch(e => { libsPdf = null; throw e; });
+  await libsPdf;
+  await document.fonts.ready;
+  const hote = document.createElement('div');
+  hote.className = 'fx-hors-ecran';
+  hote.innerHTML = ficheHTML(ch);
+  document.body.appendChild(hote);
+  try {
+    const fiche = hote.firstElementChild;
+    ajusterFiche(fiche);
+    return await html2canvas(fiche, {
+      scale: 2.5, backgroundColor: '#ffffff', useCORS: true, logging: false,
+      windowWidth: 1400, scrollX: 0, scrollY: -window.scrollY,
+    });
+  } finally {
+    hote.remove();
+  }
+}
+
+async function telechargerFiche() {
+  const bouton = document.getElementById('btn-pdf');
+  const libelle = bouton.querySelector('span');
+  const texte = libelle.textContent;
+  bouton.disabled = true;
+  libelle.textContent = 'Génération…';
+  try {
+    const ch = ETAT.config.championnats.find(c => c.id === ETAT.champ);
+    const canvas = await canvasFiche(ch);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
+    pdf.setProperties({ title: `Minima — ${ch.nom} ${ch.ville}`, author: "Groupe d'animation FFA" });
+    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 297, 210);
+    const jourFichier = new Date().toLocaleDateString('fr-FR').replaceAll('/', '-');
+    pdf.save(`Minima_${ch.ville}${jour(ch.debut).getFullYear()}_${jourFichier}.pdf`);
+  } catch (e) {
+    console.error(e);
+    alert("La fiche PDF n'a pas pu être générée. Vérifiez la connexion et réessayez.");
+  } finally {
+    bouton.disabled = false;
+    libelle.textContent = texte;
+  }
+}
+
 function choisirChampionnat(id) {
   const ch = ETAT.config.championnats.find(c => c.id === id) || ETAT.config.championnats[0];
   ETAT.champ = ch.id;
@@ -423,6 +691,9 @@ async function demarrer() {
       nav.querySelectorAll('.onglet').forEach(o => o.addEventListener('click', () => choisirChampionnat(o.dataset.id)));
     }
     choisirChampionnat(config.championnats[0].id);
+    const boutonPdf = document.getElementById('btn-pdf');
+    boutonPdf.addEventListener('click', telechargerFiche);
+    boutonPdf.disabled = false;
   } catch (e) {
     document.getElementById('contenu').innerHTML = `<div class="erreur"><b>Impossible de charger les données.</b>
       En local, ouvrez le site via un petit serveur (<code>python -m http.server</code>) plutôt qu'en double-cliquant sur le fichier.</div>`;

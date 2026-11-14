@@ -171,8 +171,17 @@ Déjà saisi dans `championnats.json`. Points qui comptent pour le scraper :
    RSS (`feed.xml`) des nouveaux qualifiés à chaque run, et le brancher sur un service
    « RSS vers e-mail » (Buttondown, Mailchimp, Follow.it…) qui gère inscriptions et
    désinscriptions sans backend. À valider avec l'utilisateur.
-8. **Résumé exportable** : remplacer l'export Excel 2026 (jugé peu satisfaisant) par un
-   résumé exploitable sur une page, probablement en PDF. À concevoir avec l'utilisateur.
+8. ✅ **Fiche PDF speaker** (bouton « Fiche PDF (1 page) », remplace l'export Excel 2026).
+   Exigences de l'utilisateur : 1 clic, A4 paysage, **jamais plus d'une page**, tout lisible
+   d'un coup d'œil par un speaker, charte du championnat actif. Fonctionnement
+   (`ficheHTML`, `ajusterFiche`, `canvasFiche` dans `index.html`) : fiche HTML de
+   1123 × 794 px construite hors écran, colonnes Hommes / Femmes, une ligne par épreuve
+   (standard, équivalent plein air, places) avec nom · perf · date · lieu · badge PA ; la
+   taille de texte descend de 14 à 9 px pour tout faire tenir, puis mode condensé
+   (2 athlètes par ligne sans date ni lieu, jusqu'à 7,5 px), puis réduction globale en
+   dernier recours. Rendu par html2canvas puis jsPDF (chargés au premier clic, cdnjs) ;
+   **pas de `color-mix()` dans les styles `.fx-*`**, html2canvas ne le lit pas. Mesuré :
+   données réelles 11 px, 72 qualifiés 9,25 px, 144 qualifiés 8,25 px condensé.
 9. **Championnats jeunes été 2027** : nouveaux onglets, chacun avec la charte graphique
    et la police de son championnat.
 
