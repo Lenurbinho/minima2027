@@ -1,17 +1,21 @@
 name: Mise à jour des minima 2027
 
 # Lancement entièrement automatique, sans PC allumé :
-#   • 3 créneaux le matin. Le cron de GitHub est parfois retardé ou sauté : chaque créneau
-#     vérifie d'abord si un créneau précédent a déjà réussi aujourd'hui, et ne fait rien
-#     dans ce cas. Un créneau sauté ou en échec est ainsi rattrapé par le suivant.
+#   • 4 créneaux la nuit. Constat de novembre 2026 : GitHub déclenche ses crons avec 7h30
+#     à 10h30 de retard (créneau de 07:35 exécuté vers 15h-16h). Programmés la nuit, ils
+#     tombent ainsi le matin. Sans retard, la mise à jour se ferait la veille au soir.
+#   • Chaque créneau vérifie d'abord si un créneau a déjà réussi dans les 12 dernières
+#     heures, et ne fait rien dans ce cas : un créneau sauté ou en échec est rattrapé par
+#     le suivant, et il n'y a qu'une mise à jour par jour.
 #   • à la main : onglet Actions → "Run workflow", ou `gh workflow run mise-a-jour.yml`
-#     (un lancement manuel tourne toujours et n'empêche pas ceux du matin).
+#     (un lancement manuel tourne toujours et n'empêche pas les créneaux automatiques).
 on:
   workflow_dispatch:
   schedule:
-    - cron: '35 6 * * *'    # 07:35 à Paris l'hiver (08:35 l'été)
-    - cron: '17 8 * * *'    # rattrapage 09:17
-    - cron: '47 10 * * *'   # rattrapage 11:47
+    - cron: '35 21 * * *'   # 22:35 à Paris l'hiver → ~7h le lendemain avec le retard habituel
+    - cron: '35 22 * * *'   # rattrapage
+    - cron: '35 23 * * *'   # rattrapage
+    - cron: '35 2 * * *'    # rattrapage tardif
 
 permissions:
   contents: write
@@ -33,18 +37,18 @@ jobs:
       GH_TOKEN: ${{ github.token }}
 
     steps:
-      - name: Déjà mis à jour aujourd'hui ?
+      - name: Déjà mis à jour ces 12 dernières heures ?
         id: deja
         run: |
           if [ "${{ github.event_name }}" != "schedule" ]; then
             echo "fait=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          jour=$(date -u +%F)
+          limite=$(( $(date +%s) - 12 * 3600 ))
           n=$(gh run list --repo "${{ github.repository }}" --workflow mise-a-jour.yml \
                 --status success --limit 30 --json createdAt,event \
-                --jq "[.[] | select(.event == \"schedule\" and (.createdAt | startswith(\"$jour\")))] | length")
+                --jq "[.[] | select(.event == \"schedule\" and (.createdAt | fromdateiso8601) >= $limite)] | length")
           if [ "$n" -gt 0 ]; then
-            echo "Mise à jour du jour déjà faite par un créneau précédent : rien à faire."
+            echo "Mise à jour déjà faite par un créneau il y a moins de 12 h : rien à faire."
             echo "fait=true" >> "$GITHUB_OUTPUT"
           else
             echo "fait=false" >> "$GITHUB_OUTPUT"

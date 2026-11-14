@@ -143,9 +143,14 @@ Déjà saisi dans `championnats.json`. Points qui comptent pour le scraper :
 - Le `schedule` (cron) de GitHub est peu fiable (retards de plusieurs heures, runs sautés).
   Solution 2026 : tâche planifiée Claude Code à 7h30 qui déclenche `workflow_dispatch`,
   mais elle ne tourne que si l'application est ouverte sur le PC de l'utilisateur.
-  **Solution 2027** (souhait de l'utilisateur : zéro PC, zéro action) : 3 créneaux cron dans
-  la matinée ; chaque créneau s'arrête tout de suite si un créneau du jour a déjà réussi.
-  Ne pas revenir à une tâche planifiée locale.
+  **Solution 2027** (souhait de l'utilisateur : zéro PC, zéro action) : plusieurs créneaux
+  cron ; chaque créneau s'arrête tout de suite si un créneau a réussi dans les 12 dernières
+  heures. Ne pas revenir à une tâche planifiée locale.
+  Constat (4-13/11/2026) : GitHub déclenche les crons de ce dépôt avec **7h30 à 10h30 de
+  retard** (créneau de 06:35 UTC exécuté vers 14h30-15h30 UTC). Depuis le 14/11/2026, les
+  créneaux sont donc la nuit (21:35, 22:35, 23:35 et 02:35 UTC) pour tomber le matin. Si la
+  mise à jour arrive le soir ou l'après-midi, comparer `createdAt` des runs aux créneaux
+  (`gh run list --workflow mise-a-jour.yml`) et recaler.
 - Prévoir `timeout-minutes: 30`.
 - Travailler avec **git normalement** (clone local, commit, push). En 2026 le dossier
   local n'était pas un dépôt git et on poussait via l'API GitHub fichier par fichier.
@@ -158,8 +163,8 @@ Déjà saisi dans `championnats.json`. Points qui comptent pour le scraper :
 2. **Minima FFA** : intégrer dès que l'utilisateur les fournit (nouveaux champs dans
    `championnats.json`, colonne « Minima FFA » déjà prévue sur le site).
 3. ✅ **Mise à jour quotidienne** : `.github/workflows/mise-a-jour.yml`, entièrement sur
-   GitHub (cron 06:35, 08:17 et 10:47 UTC avec arrêt si déjà fait + lancement manuel,
-   ~1 min 15 s, résumé dans l'onglet Actions).
+   GitHub (4 créneaux de nuit, arrêt si un run a réussi depuis moins de 12 h, lancement
+   manuel possible, ~1 min 15 s, résumé dans l'onglet Actions).
 4. ✅ **Garde-fous** (`scraper.py`) : une source en erreur, ou une épreuve qui tombe à zéro
    qualifié alors qu'elle en avait, garde les athlètes du run précédent. Conséquence : un
    faux positif ne disparaît pas tout seul, il faut l'enlever de `achievements.json` à la
