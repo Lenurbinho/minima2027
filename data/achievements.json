@@ -1,5 +1,5 @@
 {
- "maj": "2026-11-18T04:06+01:00",
+ "maj": "2026-11-19T03:45+01:00",
  "championnats": {
   "eic2027": {
    "m": {
@@ -293,15 +293,6 @@
      }
     ],
     "combines": [
-     {
-      "nom": "Auriana LAZRAQ KHLASS",
-      "perf": "4634",
-      "date": "2026-02-28",
-      "lieu": "Aubiere",
-      "source": "FFA",
-      "condition": "salle",
-      "epreuve_realisee": null
-     },
      {
       "nom": "Leonie CAMBOURS",
       "perf": "4608",
