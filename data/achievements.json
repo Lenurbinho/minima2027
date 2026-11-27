@@ -1,5 +1,5 @@
 {
- "maj": "2026-11-26T04:43+01:00",
+ "maj": "2026-11-27T04:45+01:00",
  "championnats": {
   "eic2027": {
    "m": {
@@ -95,10 +95,19 @@
     "60mH": [
      {
       "nom": "Wilhem BELOCIAN",
-      "perf": "7.45",
+      "perf": "7.42",
+      "date": "2026-03-21",
+      "lieu": "Toruń (POL)",
+      "source": "WA",
+      "condition": "salle",
+      "epreuve_realisee": null
+     },
+     {
+      "nom": "Just KWAOU-MATHEY",
+      "perf": "7.49",
       "date": "2026-03-01",
-      "lieu": "Aubiere",
-      "source": "FFA",
+      "lieu": "Aubière (FRA)",
+      "source": "WA",
       "condition": "salle",
       "epreuve_realisee": null
      },
@@ -106,19 +115,10 @@
       "nom": "Romain LECOEUR",
       "perf": "7.51",
       "date": "2026-03-01",
-      "lieu": "Aubiere",
-      "source": "FFA",
+      "lieu": "Aubière (FRA)",
+      "source": "WA",
       "condition": "salle",
       "epreuve_realisee": null
-     },
-     {
-      "nom": "Just KWAOU-MATHEY",
-      "perf": "13.16",
-      "date": "2026-08-12",
-      "lieu": "Birmingham (GBR)",
-      "source": "WA",
-      "condition": "plein_air",
-      "epreuve_realisee": "110 m haies"
      },
      {
       "nom": "Erwann CINNA",
